@@ -4,9 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Absensi &amp; Setoran Hafalan — Himalatul Qur'an</title>
-  <!-- Pustaka Ringan Pemindai QR & Generator QR -->
-  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <style>
     :root {
       --bg: #f8fafc;
@@ -20,8 +17,6 @@
       --primary-light: #ccfbf1;
       --success: #16a34a;
       --success-bg: #dcfce7;
-      --warning: #d97706;
-      --warning-bg: #fef3c7;
       --danger: #dc2626;
       --danger-bg: #fee2e2;
       --info: #0284c7;
@@ -61,7 +56,6 @@
     .btn-primary:hover:not(:disabled) { background: var(--primary-hover); }
     .btn-success { background: var(--success); color: #fff; }
     .btn-success:hover:not(:disabled) { filter: brightness(0.92); }
-    .btn-warning { background: var(--warning-bg); color: #92400e; border-color: #fde68a; }
     .btn-danger { background: var(--danger-bg); color: var(--danger); border-color: #fecaca; }
     .btn-info { background: var(--info-bg); color: #075985; border-color: #bae6fd; }
     .btn-outline { background: var(--surface); border-color: var(--border); color: var(--text); }
@@ -101,7 +95,6 @@
       white-space: nowrap;
     }
     .badge-hadir { background: var(--success-bg); color: #166534; }
-    .badge-terlambat { background: var(--warning-bg); color: #92400e; }
     .badge-izin { background: var(--info-bg); color: #075985; }
     .badge-alpha { background: var(--danger-bg); color: #991b1b; }
     .badge-belum { background: var(--surface-alt); color: var(--text-muted); }
@@ -126,12 +119,10 @@
     .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
     .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
     .grid-4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
-    .grid-5 { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; }
-    @media (max-width: 900px) {
-      .grid-2, .grid-4, .grid-5, .grid-3 { grid-template-columns: 1fr; }
+    @media (max-width: 860px) {
+      .grid-2, .grid-4, .grid-3 { grid-template-columns: 1fr; }
     }
 
-    /* Layar Login */
     .auth-wrapper {
       min-height: 100vh;
       display: flex;
@@ -142,7 +133,7 @@
     }
     .auth-card {
       width: 100%;
-      max-width: 430px;
+      max-width: 410px;
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 16px;
@@ -163,7 +154,6 @@
       margin-bottom: 14px;
     }
 
-    /* Header & Navigasi */
     header.topbar {
       background: var(--surface);
       border-bottom: 1px solid var(--border);
@@ -172,7 +162,7 @@
       z-index: 30;
     }
     .topbar-inner {
-      max-width: 1220px;
+      max-width: 1200px;
       margin: 0 auto;
       padding: 12px 16px;
       display: flex;
@@ -219,17 +209,8 @@
       color: var(--primary);
     }
 
-    .demo-banner {
-      background: #fffbeb;
-      border-bottom: 1px solid #fde68a;
-      color: #92400e;
-      font-size: 0.82rem;
-      text-align: center;
-      padding: 6px 12px;
-    }
-
     main.container {
-      max-width: 1220px;
+      max-width: 1200px;
       margin: 0 auto;
       padding: 20px 16px 60px;
       display: flex;
@@ -272,22 +253,6 @@
     tr:last-child td { border-bottom: none; }
     tr:hover td { background: #f8fafc; }
 
-    #qr-reader {
-      width: 100%;
-      border-radius: 10px;
-      overflow: hidden;
-      border: 1px solid var(--border);
-      background: #0f172a;
-      min-height: 220px;
-    }
-    .scan-feedback {
-      margin-top: 12px;
-      padding: 12px 14px;
-      border-radius: 10px;
-      font-size: 0.9rem;
-      font-weight: 600;
-    }
-
     .modal-backdrop {
       position: fixed;
       inset: 0;
@@ -301,24 +266,22 @@
     .modal {
       background: var(--surface);
       border-radius: 14px;
-      max-width: 500px;
+      max-width: 620px;
       width: 100%;
       padding: 22px;
       box-shadow: 0 20px 40px rgba(15, 23, 42, 0.2);
       max-height: 92vh;
       overflow-y: auto;
     }
-    .qr-badge-card {
-      border: 2px dashed var(--border);
-      border-radius: 12px;
-      padding: 22px;
-      text-align: center;
-      background: #fff;
-    }
-    #qrBadgeCanvas {
+
+    .setoran-item-box {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      background: #f8fafc;
       display: flex;
-      justify-content: center;
-      margin: 14px auto;
+      flex-direction: column;
+      gap: 10px;
     }
 
     #toastContainer {
@@ -347,76 +310,39 @@
       from { transform: translateY(10px); opacity: 0; }
       to { transform: translateY(0); opacity: 1; }
     }
-
-    @media print {
-      body * { visibility: hidden; }
-      #qrBadgePrintArea, #qrBadgePrintArea * { visibility: visible; }
-      #qrBadgePrintArea {
-        position: fixed;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
-        width: 320px;
-      }
-    }
   </style>
 </head>
 <body>
 
-  <!-- ==================== LAYAR LOGIN (ADMIN & SANTRI) ==================== -->
+  <!-- ==================== LAYAR LOGIN ==================== -->
   <section id="authScreen" class="auth-wrapper">
     <div class="auth-card">
       <div class="auth-logo">HQ</div>
-      <h1 style="font-size:1.25rem; font-weight:800; margin-bottom:4px;">Absensi &amp; Setoran Hafalan</h1>
-      <p style="font-size:0.86rem; color:var(--text-muted); margin-bottom:14px;">
-        Halaqah Himalatul Qur'an — pilih mode masuk di bawah ini.
+      <h1 style="font-size:1.25rem; font-weight:800; margin-bottom:4px;">Himalatul Qur'an</h1>
+      <p style="font-size:0.86rem; color:var(--text-muted); margin-bottom:18px;">
+        Sistem Absensi &amp; Setoran Hafalan Al-Qur'an
       </p>
 
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; background:var(--surface-alt); padding:4px; border-radius:10px; margin-bottom:16px;">
-        <button type="button" class="nav-tab active" id="modeAdminBtn" style="text-align:center;">Admin / Ustadz</button>
-        <button type="button" class="nav-tab" id="modeStudentBtn" style="text-align:center;">Murid / Santri</button>
-      </div>
-
-      <!-- Form Login Admin -->
       <form id="loginForm" style="display:flex; flex-direction:column; gap:12px;">
         <div>
-          <label for="apiUrlInput">URL Web App Google Apps Script</label>
-          <input id="apiUrlInput" type="url" placeholder="https://script.google.com/macros/s/.../exec" />
-          <small style="color:var(--text-muted); font-size:0.75rem;">
-            Kosongkan untuk <strong>Mode Demo Lokal</strong> (PIN bawaan: <code>1234</code>).
-          </small>
+          <label for="usernameInput">Username</label>
+          <input id="usernameInput" type="text" autocomplete="username" required />
         </div>
 
         <div>
-          <label for="pinInput">PIN Admin</label>
-          <input id="pinInput" type="password" inputmode="numeric" placeholder="Masukkan PIN (contoh: 1234)" required />
+          <label for="passwordInput">Password</label>
+          <input id="passwordInput" type="password" autocomplete="current-password" required />
         </div>
 
-        <button type="submit" class="btn-primary" id="loginBtn" style="width:100%; padding:11px;">
-          Masuk sebagai Admin
+        <button type="submit" class="btn-primary" id="loginBtn" style="width:100%; padding:11px; margin-top:4px;">
+          Masuk
         </button>
       </form>
-
-      <!-- Form Login Murid / Santri -->
-      <form id="studentLoginForm" class="hidden" style="display:flex; flex-direction:column; gap:12px;">
-        <div>
-          <label for="studentUsernameInput">Username (Nama Lengkap Huruf Kecil)</label>
-          <input id="studentUsernameInput" type="text" placeholder="contoh: fitriati sulaiman" required />
-        </div>
-        <div>
-          <label for="studentPasswordInput">Password (Kata Pertama + 1234)</label>
-          <input id="studentPasswordInput" type="password" placeholder="contoh: fitriati1234" required />
-        </div>
-        <button type="submit" class="btn-primary" id="studentLoginBtn" style="width:100%; padding:11px;">
-          Lihat Data Saya
-        </button>
-      </form>
-
       <p id="loginError" style="color:var(--danger); font-size:0.84rem; margin-top:10px;" class="hidden"></p>
     </div>
   </section>
 
-  <!-- ==================== DASBOR KHUSUS MURID / SANTRI ==================== -->
+  <!-- ==================== DASBOR KHUSUS SANTRI (READ-ONLY) ==================== -->
   <div id="studentShell" class="hidden">
     <header class="topbar">
       <div class="topbar-inner">
@@ -424,20 +350,16 @@
           <div class="brand-icon">HQ</div>
           <div>
             <div id="studentHeaderName" style="line-height:1.2;">Nama Santri</div>
-            <div id="studentHeaderMeta" style="font-size:0.74rem; font-weight:500; color:var(--text-muted);">ID Santri</div>
+            <div id="studentHeaderMeta" style="font-size:0.74rem; font-weight:500; color:var(--text-muted);">HIMALATUL QUR'AN</div>
           </div>
         </div>
-        <div style="display:flex; gap:8px; align-items:center;">
-          <button class="btn-primary btn-sm" id="studentShowQrBtn">Kartu QR Saya</button>
-          <button class="btn-danger btn-sm" id="studentLogoutBtn">Keluar</button>
-        </div>
+        <button class="btn-danger btn-sm" id="studentLogoutBtn">Keluar</button>
       </div>
     </header>
 
     <main class="container">
-      <div class="grid-5">
+      <div class="grid-4">
         <div class="stat-box"><div class="stat-label">Hadir</div><div class="stat-value" style="color:var(--success)" id="stStatHadir">0</div></div>
-        <div class="stat-box"><div class="stat-label">Terlambat</div><div class="stat-value" style="color:var(--warning)" id="stStatTerlambat">0</div></div>
         <div class="stat-box"><div class="stat-label">Izin</div><div class="stat-value" style="color:var(--info)" id="stStatIzin">0</div></div>
         <div class="stat-box"><div class="stat-label">Alpha</div><div class="stat-value" style="color:var(--danger)" id="stStatAlpha">0</div></div>
         <div class="stat-box"><div class="stat-label">Total Setoran</div><div class="stat-value" style="color:var(--primary)" id="stStatSetoran">0</div></div>
@@ -445,9 +367,9 @@
 
       <div class="card">
         <div class="card-title" style="flex-wrap:wrap;">
-          <span>Riwayat Kehadiran &amp; Setoran Hafalan Saya</span>
+          <span>Rekap Absensi &amp; Setoran Hafalan Saya</span>
           <div style="display:flex; gap:8px; align-items:center;">
-            <input id="studentMonthFilter" type="month" style="width:auto;" title="Filter per bulan" />
+            <input id="studentMonthFilter" type="month" style="width:auto;" />
             <button class="btn-outline btn-sm" id="studentClearMonthBtn">Semua Bulan</button>
           </div>
         </div>
@@ -455,12 +377,13 @@
           <table>
             <thead>
               <tr>
-                <th>Tanggal &amp; Sesi</th>
+                <th>Tanggal</th>
                 <th>Status</th>
-                <th>Surah &amp; Ayat</th>
+                <th>Surah</th>
+                <th>Ayat</th>
                 <th>Juz</th>
                 <th>Jenis</th>
-                <th>Nilai</th>
+                <th>Kesalahan Baca</th>
                 <th>Catatan</th>
               </tr>
             </thead>
@@ -471,29 +394,24 @@
     </main>
   </div>
 
-  <!-- ==================== APLIKASI UTAMA ==================== -->
+  <!-- ==================== DASBOR ADMIN ==================== -->
   <div id="appShell" class="hidden">
-    <div id="demoBanner" class="demo-banner hidden">
-      <strong>Mode Demo Lokal:</strong> Data disimpan di penyimpanan browser (localStorage). Masukkan URL Google Apps Script di menu <strong>Pengaturan</strong> untuk sinkronisasi ke Google Sheets.
-    </div>
-
     <header class="topbar">
       <div class="topbar-inner">
         <div class="brand">
           <div class="brand-icon">HQ</div>
-          <span>Tahfidz &amp; Setoran</span>
+          <span>Himalatul Qur'an</span>
         </div>
 
         <nav class="nav-tabs" id="navTabs">
           <button class="nav-tab active" data-tab="checkin">Absensi &amp; Setoran</button>
-          <button class="nav-tab" data-tab="events">Jadwal Sesi</button>
           <button class="nav-tab" data-tab="attendees">Data Santri</button>
           <button class="nav-tab" data-tab="reports">Laporan</button>
         </nav>
 
         <div style="display:flex; gap:8px; align-items:center;">
-          <button class="btn-outline btn-sm" id="syncBtn" title="Segarkan data">↻ Sinkronkan</button>
-          <button class="btn-outline btn-sm" id="openSettingsBtn">⚙ Pengaturan</button>
+          <button class="btn-outline btn-sm" id="syncBtn">↻ Sinkronkan</button>
+          <button class="btn-outline btn-sm" id="openSettingsBtn">⚙ Ubah Password</button>
           <button class="btn-danger btn-sm" id="logoutBtn">Keluar</button>
         </div>
       </div>
@@ -505,119 +423,46 @@
         <div class="card">
           <div class="grid-2" style="align-items:end;">
             <div>
-              <label for="activeEventSelect">Sesi Halaqah / Setoran Aktif</label>
-              <select id="activeEventSelect"></select>
+              <label for="activeDateInput">Tanggal Absensi &amp; Setoran</label>
+              <input id="activeDateInput" type="date" />
             </div>
-            <div id="activeEventMeta" style="font-size:0.84rem; color:var(--text-muted); padding-bottom:6px;">
-              Pilih sesi halaqah untuk memulai absensi dan setoran.
+            <div>
+              <label for="manualSearchInput">Cari Santri</label>
+              <input id="manualSearchInput" type="search" placeholder="Cari nama atau ID santri..." />
             </div>
           </div>
         </div>
 
-        <div class="grid-5" id="checkinStats">
-          <div class="stat-box"><div class="stat-label">Hadir (Tepat Waktu)</div><div class="stat-value" style="color:var(--success)" id="statPresent">0</div></div>
-          <div class="stat-box"><div class="stat-label">Terlambat</div><div class="stat-value" style="color:var(--warning)" id="statLate">0</div></div>
+        <div class="grid-4" id="checkinStats">
+          <div class="stat-box"><div class="stat-label">Hadir</div><div class="stat-value" style="color:var(--success)" id="statPresent">0</div></div>
           <div class="stat-box"><div class="stat-label">Izin</div><div class="stat-value" style="color:var(--info)" id="statExcused">0</div></div>
           <div class="stat-box"><div class="stat-label">Alpha / Belum</div><div class="stat-value" style="color:var(--danger)" id="statAbsent">0</div></div>
-          <div class="stat-box"><div class="stat-label">Sudah Setoran</div><div class="stat-value" style="color:var(--primary)" id="statSetoran">0</div></div>
+          <div class="stat-box"><div class="stat-label">Setoran Tercatat</div><div class="stat-value" style="color:var(--primary)" id="statSetoran">0</div></div>
         </div>
 
-        <div class="grid-2">
-          <!-- Panel Pemindai QR -->
-          <div class="card">
-            <div class="card-title">
-              <span>Scan QR Code Kehadiran</span>
-              <div style="display:flex; gap:6px;">
-                <button class="btn-primary btn-sm" id="startScanBtn">Mulai Kamera</button>
-                <button class="btn-outline btn-sm hidden" id="stopScanBtn">Hentikan Kamera</button>
-              </div>
-            </div>
-            <div id="qr-reader"></div>
-            <div id="scanFeedback" class="scan-feedback hidden"></div>
-            <div style="margin-top:12px; display:flex; gap:8px;">
-              <input id="quickIdInput" type="text" placeholder="Atau ketik ID Santri lalu tekan Enter..." />
-              <button class="btn-primary" id="quickCheckInBtn">Absen</button>
-            </div>
-          </div>
-
-          <!-- Panel Pencarian Manual & Catat Setoran -->
-          <div class="card">
-            <div class="card-title">
-              <span>Daftar Santri &amp; Catat Setoran</span>
-              <span style="font-size:0.78rem; color:var(--text-muted);" id="rosterCountLabel">0 santri</span>
-            </div>
-            <input id="manualSearchInput" type="search" placeholder="Cari nama santri, ID, kontak, atau halaqah..." style="margin-bottom:12px;" />
-            <div class="table-wrap" style="max-height:400px; overflow-y:auto;">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Santri &amp; Setoran</th>
-                    <th>Status</th>
-                    <th>Aksi</th>
-                  </tr>
-                </thead>
-                <tbody id="manualCheckInBody"></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ==================== TAB 2: JADWAL SESI ==================== -->
-      <section id="tab-events" class="tab-panel hidden" style="display:flex; flex-direction:column; gap:16px;">
         <div class="card">
           <div class="card-title">
-            <span id="eventFormTitle">Buat Jadwal Sesi Halaqah Baru</span>
-            <button class="btn-outline btn-sm hidden" id="cancelEditEventBtn">Batal Edit</button>
+            <span>Daftar Kehadiran &amp; Setoran Santri</span>
+            <span style="font-size:0.78rem; color:var(--text-muted);" id="rosterCountLabel">0 santri</span>
           </div>
-          <form id="eventForm" class="grid-4" style="align-items:end;">
-            <input type="hidden" id="editEventId" />
-            <div>
-              <label for="evName">Nama Sesi / Halaqah</label>
-              <input id="evName" type="text" placeholder="cth. Halaqah Subuh / Tahfidz Sore" required />
-            </div>
-            <div>
-              <label for="evDate">Tanggal</label>
-              <input id="evDate" type="date" required />
-            </div>
-            <div>
-              <label for="evStart">Jam Mulai</label>
-              <input id="evStart" type="time" required />
-            </div>
-            <div>
-              <label for="evCutoff">Batas Waktu Terlambat</label>
-              <input id="evCutoff" type="time" required />
-            </div>
-            <div style="grid-column: 1 / -1; display:flex; justify-content:flex-end;">
-              <button type="submit" class="btn-primary" id="saveEventBtn">Simpan Sesi</button>
-            </div>
-          </form>
-        </div>
-
-        <div class="card">
-          <div class="card-title"><span>Daftar Jadwal Sesi Halaqah</span></div>
           <div class="table-wrap">
             <table>
               <thead>
                 <tr>
-                  <th>Nama Sesi</th>
-                  <th>Tanggal</th>
-                  <th>Mulai</th>
-                  <th>Batas Terlambat</th>
-                  <th>Hadir / Total</th>
+                  <th>Santri &amp; Setoran Hari Ini</th>
+                  <th>Status</th>
                   <th>Aksi</th>
                 </tr>
               </thead>
-              <tbody id="eventsTableBody"></tbody>
+              <tbody id="manualCheckInBody"></tbody>
             </table>
           </div>
         </div>
       </section>
 
-      <!-- ==================== TAB 3: DATA SANTRI ==================== -->
+      <!-- ==================== TAB 2: DATA SANTRI ==================== -->
       <section id="tab-attendees" class="tab-panel hidden" style="display:flex; flex-direction:column; gap:16px;">
         <div class="grid-2">
-          <!-- Tambah / Edit Santri -->
           <div class="card">
             <div class="card-title">
               <span id="attendeeFormTitle">Tambah Santri</span>
@@ -626,19 +471,19 @@
             <form id="attendeeForm" class="grid-2" style="gap:10px;">
               <div>
                 <label for="attId">ID Santri (opsional)</label>
-                <input id="attId" type="text" placeholder="Otomatis jika dikosongkan" />
+                <input id="attId" type="text" />
               </div>
               <div>
                 <label for="attName">Nama Lengkap *</label>
-                <input id="attName" type="text" placeholder="cth. Ahmad Fauzan" required />
+                <input id="attName" type="text" required />
               </div>
               <div>
-                <label for="attContact">No. WA Wali / Email</label>
-                <input id="attContact" type="text" placeholder="08123456789" />
+                <label for="attContact">No. WA / Kontak</label>
+                <input id="attContact" type="text" />
               </div>
               <div>
                 <label for="attGroup">Kelompok / Halaqah</label>
-                <input id="attGroup" type="text" placeholder="Juz 30, Tahfidz, Reguler..." value="Reguler" />
+                <input id="attGroup" type="text" value="HIMALATUL QUR'AN" />
               </div>
               <div style="grid-column: 1 / -1; display:flex; justify-content:flex-end;">
                 <button type="submit" class="btn-primary" id="saveAttendeeBtn">Simpan Santri</button>
@@ -646,17 +491,16 @@
             </form>
           </div>
 
-          <!-- Impor CSV Massal -->
           <div class="card">
             <div class="card-title">
               <span>Impor Santri Massal (CSV)</span>
-              <button class="btn-outline btn-sm" id="downloadSampleCsvBtn">Contoh CSV</button>
+              <button class="btn-outline btn-sm" id="downloadSampleCsvBtn">Unduh Format CSV</button>
             </div>
             <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:8px;">
-              Format kolom: <code>AttendeeID,FullName,Contact,GroupType</code> (ID Santri boleh kosong).
+              Format kolom: <code>AttendeeID,FullName,Contact,GroupType</code>
             </p>
             <input type="file" id="csvFileInput" accept=".csv,text/csv" style="margin-bottom:8px;" />
-            <textarea id="csvPasteArea" rows="3" placeholder="Atau tempel (paste) baris CSV di sini..."></textarea>
+            <textarea id="csvPasteArea" rows="3"></textarea>
             <div style="display:flex; justify-content:flex-end; margin-top:8px;">
               <button class="btn-primary btn-sm" id="importCsvBtn">Impor Data Santri</button>
             </div>
@@ -674,7 +518,8 @@
                 <tr>
                   <th>ID Santri</th>
                   <th>Nama Lengkap</th>
-                  <th>Kontak / WA</th>
+                  <th>Username Login</th>
+                  <th>Kontak</th>
                   <th>Halaqah</th>
                   <th>Aksi</th>
                 </tr>
@@ -685,7 +530,7 @@
         </div>
       </section>
 
-      <!-- ==================== TAB 4: LAPORAN BULANAN ==================== -->
+      <!-- ==================== TAB 3: LAPORAN BULANAN ==================== -->
       <section id="tab-reports" class="tab-panel hidden" style="display:flex; flex-direction:column; gap:16px;">
         <div class="card" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
           <div>
@@ -696,9 +541,9 @@
         </div>
 
         <div class="grid-4">
-          <div class="stat-box"><div class="stat-label">Jumlah Sesi</div><div class="stat-value" id="repEventsCount">0</div></div>
-          <div class="stat-box"><div class="stat-label">Tingkat Tepat Waktu</div><div class="stat-value" style="color:var(--success)" id="repOnTimeRate">0%</div></div>
-          <div class="stat-box"><div class="stat-label">Terlambat / Alpha</div><div class="stat-value" style="color:var(--warning)" id="repLateNoShow">0 / 0</div></div>
+          <div class="stat-box"><div class="stat-label">Hari Pertemuan</div><div class="stat-value" id="repEventsCount">0</div></div>
+          <div class="stat-box"><div class="stat-label">Tingkat Kehadiran</div><div class="stat-value" style="color:var(--success)" id="repAttendRate">0%</div></div>
+          <div class="stat-box"><div class="stat-label">Izin / Alpha</div><div class="stat-value" style="color:var(--danger)" id="repIzinAlpha">0 / 0</div></div>
           <div class="stat-box"><div class="stat-label">Total Setoran Hafalan</div><div class="stat-value" style="color:var(--primary)" id="repTotalSetoran">0</div></div>
         </div>
 
@@ -710,13 +555,12 @@
                 <tr>
                   <th>Santri</th>
                   <th>Halaqah</th>
-                  <th>Sesi</th>
+                  <th>Pertemuan</th>
                   <th>Hadir</th>
-                  <th>Terlambat</th>
                   <th>Izin</th>
                   <th>Alpha</th>
                   <th>Kehadiran</th>
-                  <th>Setoran</th>
+                  <th>Jumlah Setoran</th>
                   <th>Setoran Terakhir</th>
                 </tr>
               </thead>
@@ -728,7 +572,7 @@
     </main>
   </div>
 
-  <!-- ==================== MODAL SETORAN HAFALAN ==================== -->
+  <!-- ==================== MODAL CATAT SETORAN MULTI-SURAH ==================== -->
   <div id="setoranModal" class="modal-backdrop hidden">
     <div class="modal">
       <div class="card-title">
@@ -738,114 +582,36 @@
       <p style="font-size:0.86rem; color:var(--text-muted); margin-bottom:14px;">
         Santri: <strong id="setoranSantriName" style="color:var(--text);"></strong> (<code id="setoranSantriId"></code>)
       </p>
+
       <form id="setoranForm" style="display:flex; flex-direction:column; gap:12px;">
         <input type="hidden" id="setoranAttIdInput" />
-        <div class="grid-2">
-          <div>
-            <label for="setoranSurah">Nama Surah *</label>
-            <input id="setoranSurah" list="surahList" placeholder="cth. An-Naba" required />
-            <datalist id="surahList">
-              <option value="Al-Fatihah"></option><option value="Al-Baqarah"></option><option value="Ali 'Imran"></option>
-              <option value="An-Nisa"></option><option value="Al-Ma'idah"></option><option value="Al-An'am"></option>
-              <option value="Yasin"></option><option value="Ar-Rahman"></option><option value="Al-Waqi'ah"></option>
-              <option value="Al-Mulk"></option><option value="Al-Qalam"></option><option value="Al-Haqqah"></option>
-              <option value="An-Naba"></option><option value="An-Nazi'at"></option><option value="'Abasa"></option>
-              <option value="At-Takwir"></option><option value="Al-Infitar"></option><option value="Al-Mutaffifin"></option>
-              <option value="Al-Insyiqaq"></option><option value="Al-Buruj"></option><option value="At-Tariq"></option>
-              <option value="Al-A'la"></option><option value="Al-Ghasyiyah"></option><option value="Al-Fajr"></option>
-              <option value="Al-Balad"></option><option value="Asy-Syams"></option><option value="Al-Lail"></option>
-              <option value="Ad-Duha"></option><option value="Al-Insyirah"></option><option value="At-Tin"></option>
-              <option value="Al-'Alaq"></option><option value="Al-Qadr"></option><option value="Al-Bayyinah"></option>
-              <option value="Az-Zalzalah"></option><option value="Al-'Adiyat"></option><option value="Al-Qari'ah"></option>
-              <option value="At-Takasur"></option><option value="Al-'Asr"></option><option value="Al-Humazah"></option>
-              <option value="Al-Fil"></option><option value="Quraisy"></option><option value="Al-Ma'un"></option>
-              <option value="Al-Kausar"></option><option value="Al-Kafirun"></option><option value="An-Nasr"></option>
-              <option value="Al-Lahab"></option><option value="Al-Ikhlas"></option><option value="Al-Falaq"></option>
-              <option value="An-Nas"></option>
-            </datalist>
-          </div>
-          <div>
-            <label for="setoranAyat">Ayat *</label>
-            <input id="setoranAyat" type="text" placeholder="cth. 1 - 20" required />
-          </div>
-        </div>
-
-        <div class="grid-3">
-          <div>
-            <label for="setoranJuz">Juz</label>
-            <input id="setoranJuz" type="number" min="1" max="30" placeholder="1-30" value="30" />
-          </div>
-          <div>
-            <label for="setoranJenis">Jenis Setoran</label>
-            <select id="setoranJenis">
-              <option value="Ziyadah">Ziyadah (Hafalan Baru)</option>
-              <option value="Murajaah">Murajaah (Mengulang)</option>
-              <option value="Tasmi'">Tasmi'</option>
-            </select>
-          </div>
-          <div>
-            <label for="setoranNilai">Nilai / Predikat</label>
-            <select id="setoranNilai">
-              <option value="Mumtaz (A)">Mumtaz (A)</option>
-              <option value="Jayyid Jiddan (B)" selected>Jayyid Jiddan (B)</option>
-              <option value="Jayyid (C)">Jayyid (C)</option>
-              <option value="Perlu Mengulang (D)">Perlu Mengulang (D)</option>
-            </select>
-          </div>
-        </div>
+        <div id="setoranItemsContainer" style="display:flex; flex-direction:column; gap:12px;"></div>
 
         <div>
-          <label for="setoranNotes">Catatan Ustadz / Pembimbing</label>
-          <textarea id="setoranNotes" rows="2" placeholder="Tajwid, makhraj, atau kelancaran..."></textarea>
+          <button type="button" class="btn-outline btn-sm" id="addSetoranItemBtn">+ Tambah Surah / Juz Lain</button>
         </div>
 
-        <div style="display:flex; gap:10px; justify-content:flex-end;">
+        <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:6px;">
           <button type="button" class="btn-outline" id="cancelSetoranBtn">Batal</button>
-          <button type="submit" class="btn-primary">Simpan Setoran</button>
+          <button type="submit" class="btn-primary" id="saveSetoranBtn">Simpan Setoran</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- ==================== MODAL KARTU QR SANTRI ==================== -->
-  <div id="qrModal" class="modal-backdrop hidden">
-    <div class="modal">
-      <div class="card-title">
-        <span>Kartu QR Santri</span>
-        <button class="btn-outline btn-sm" id="closeQrModalBtn">✕</button>
-      </div>
-      <div id="qrBadgePrintArea" class="qr-badge-card">
-        <div style="font-size:0.75rem; font-weight:700; color:var(--primary); text-transform:uppercase; letter-spacing:0.06em;" id="badgeGroup">HALAQAH</div>
-        <h2 style="font-size:1.25rem; font-weight:800; margin-top:4px;" id="badgeName">Nama Santri</h2>
-        <div id="qrBadgeCanvas"></div>
-        <div style="font-family:monospace; font-size:0.9rem; font-weight:700; color:var(--text-muted);" id="badgeId">SANTRI-0000</div>
-      </div>
-      <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:16px;">
-        <button class="btn-outline" id="closeQrModalBtn2">Tutup</button>
-        <button class="btn-primary" onclick="window.print()">🖨 Cetak Kartu</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ==================== MODAL PENGATURAN ==================== -->
+  <!-- ==================== MODAL UBAH PASSWORD ADMIN ==================== -->
   <div id="settingsModal" class="modal-backdrop hidden">
-    <div class="modal">
+    <div class="modal" style="max-width:420px;">
       <div class="card-title">
-        <span>Pengaturan Aplikasi</span>
+        <span>Ubah Password Admin</span>
         <button class="btn-outline btn-sm" id="closeSettingsBtn">✕</button>
       </div>
-      <div style="display:flex; flex-direction:column; gap:14px;">
+      <div style="display:flex; flex-direction:column; gap:12px;">
         <div>
-          <label for="settingsApiUrl">URL Web App Google Apps Script</label>
-          <input id="settingsApiUrl" type="url" placeholder="https://script.google.com/macros/s/.../exec" />
+          <label for="newPinInput">Password Admin Baru (minimal 4 karakter)</label>
+          <input id="newPinInput" type="password" />
         </div>
-        <button class="btn-primary" id="saveApiUrlBtn">Simpan &amp; Hubungkan Ulang</button>
-        <hr style="border:none; border-top:1px solid var(--border);" />
-        <div>
-          <label for="newPinInput">Ubah PIN Admin (minimal 4 karakter)</label>
-          <input id="newPinInput" type="password" inputmode="numeric" placeholder="PIN Baru" />
-        </div>
-        <button class="btn-outline" id="updatePinBtn">Perbarui PIN Admin</button>
+        <button class="btn-primary" id="updatePinBtn">Simpan Password Baru</button>
       </div>
     </div>
   </div>
@@ -853,28 +619,154 @@
   <div id="toastContainer"></div>
 
   <script>
-    // Opsional: Tempel URL Web App Google Apps Script Anda di sini agar otomatis terhubung.
-    const DEFAULT_API_URL = 'https://script.google.com/macros/s/AKfycbwZOuHap1xHGW5XauDcy5vAyjgvZ53YuzsChBIzdGQjc68Px7lirKPTjHuGpSbxhqCo/exec';
+    const FIXED_API_URL = 'https://script.google.com/macros/s/AKfycbwZOuHap1xHGW5XauDcy5vAyjgvZ53YuzsChBIzdGQjc68Px7lirKPTjHuGpSbxhqCo/exec';
 
-    const STORAGE_KEYS = {
-      API_URL: 'hq_api_url',
-      PIN: 'hq_session_pin',
-      DEMO_DATA: 'hq_demo_data_v3',
-      DEMO_PIN: 'hq_demo_pin'
-    };
+    const QURAN_JUZ_ENTRIES = [
+      { no: 1, surah: "Al-Fatihah", min: 1, max: 7, juz: 1 },
+      { no: 2, surah: "Al-Baqarah", min: 1, max: 141, juz: 1 },
+      { no: 2, surah: "Al-Baqarah", min: 142, max: 252, juz: 2 },
+      { no: 2, surah: "Al-Baqarah", min: 253, max: 286, juz: 3 },
+      { no: 3, surah: "Ali 'Imran", min: 1, max: 92, juz: 3 },
+      { no: 3, surah: "Ali 'Imran", min: 93, max: 200, juz: 4 },
+      { no: 4, surah: "An-Nisa'", min: 1, max: 23, juz: 4 },
+      { no: 4, surah: "An-Nisa'", min: 24, max: 147, juz: 5 },
+      { no: 4, surah: "An-Nisa'", min: 148, max: 176, juz: 6 },
+      { no: 5, surah: "Al-Ma'idah", min: 1, max: 81, juz: 6 },
+      { no: 5, surah: "Al-Ma'idah", min: 82, max: 120, juz: 7 },
+      { no: 6, surah: "Al-An'am", min: 1, max: 110, juz: 7 },
+      { no: 6, surah: "Al-An'am", min: 111, max: 165, juz: 8 },
+      { no: 7, surah: "Al-A'raf", min: 1, max: 87, juz: 8 },
+      { no: 7, surah: "Al-A'raf", min: 88, max: 206, juz: 9 },
+      { no: 8, surah: "Al-Anfal", min: 1, max: 40, juz: 9 },
+      { no: 8, surah: "Al-Anfal", min: 41, max: 75, juz: 10 },
+      { no: 9, surah: "At-Taubah", min: 1, max: 92, juz: 10 },
+      { no: 9, surah: "At-Taubah", min: 93, max: 129, juz: 11 },
+      { no: 10, surah: "Yunus", min: 1, max: 109, juz: 11 },
+      { no: 11, surah: "Hud", min: 1, max: 5, juz: 11 },
+      { no: 11, surah: "Hud", min: 6, max: 123, juz: 12 },
+      { no: 12, surah: "Yusuf", min: 1, max: 52, juz: 12 },
+      { no: 12, surah: "Yusuf", min: 53, max: 111, juz: 13 },
+      { no: 13, surah: "Ar-Ra'd", min: 1, max: 43, juz: 13 },
+      { no: 14, surah: "Ibrahim", min: 1, max: 52, juz: 13 },
+      { no: 15, surah: "Al-Hijr", min: 1, max: 99, juz: 14 },
+      { no: 16, surah: "An-Nahl", min: 1, max: 128, juz: 14 },
+      { no: 17, surah: "Al-Isra'", min: 1, max: 111, juz: 15 },
+      { no: 18, surah: "Al-Kahf", min: 1, max: 74, juz: 15 },
+      { no: 18, surah: "Al-Kahf", min: 75, max: 110, juz: 16 },
+      { no: 19, surah: "Maryam", min: 1, max: 98, juz: 16 },
+      { no: 20, surah: "Taha", min: 1, max: 135, juz: 16 },
+      { no: 21, surah: "Al-Anbiya'", min: 1, max: 112, juz: 17 },
+      { no: 22, surah: "Al-Hajj", min: 1, max: 78, juz: 17 },
+      { no: 23, surah: "Al-Mu'minun", min: 1, max: 118, juz: 18 },
+      { no: 24, surah: "An-Nur", min: 1, max: 64, juz: 18 },
+      { no: 25, surah: "Al-Furqan", min: 1, max: 20, juz: 18 },
+      { no: 25, surah: "Al-Furqan", min: 21, max: 77, juz: 19 },
+      { no: 26, surah: "Asy-Syu'ara'", min: 1, max: 227, juz: 19 },
+      { no: 27, surah: "An-Naml", min: 1, max: 55, juz: 19 },
+      { no: 27, surah: "An-Naml", min: 56, max: 93, juz: 20 },
+      { no: 28, surah: "Al-Qasas", min: 1, max: 88, juz: 20 },
+      { no: 29, surah: "Al-'Ankabut", min: 1, max: 45, juz: 20 },
+      { no: 29, surah: "Al-'Ankabut", min: 46, max: 69, juz: 21 },
+      { no: 30, surah: "Ar-Rum", min: 1, max: 60, juz: 21 },
+      { no: 31, surah: "Luqman", min: 1, max: 34, juz: 21 },
+      { no: 32, surah: "As-Sajdah", min: 1, max: 30, juz: 21 },
+      { no: 33, surah: "Al-Ahzab", min: 1, max: 30, juz: 21 },
+      { no: 33, surah: "Al-Ahzab", min: 31, max: 73, juz: 22 },
+      { no: 34, surah: "Saba'", min: 1, max: 54, juz: 22 },
+      { no: 35, surah: "Fatir", min: 1, max: 45, juz: 22 },
+      { no: 36, surah: "Yasin", min: 1, max: 27, juz: 22 },
+      { no: 36, surah: "Yasin", min: 28, max: 83, juz: 23 },
+      { no: 37, surah: "As-Saffat", min: 1, max: 182, juz: 23 },
+      { no: 38, surah: "Sad", min: 1, max: 88, juz: 23 },
+      { no: 39, surah: "Az-Zumar", min: 1, max: 31, juz: 23 },
+      { no: 39, surah: "Az-Zumar", min: 32, max: 75, juz: 24 },
+      { no: 40, surah: "Gafir", min: 1, max: 85, juz: 24 },
+      { no: 41, surah: "Fussilat", min: 1, max: 46, juz: 24 },
+      { no: 41, surah: "Fussilat", min: 47, max: 54, juz: 25 },
+      { no: 42, surah: "Asy-Syura", min: 1, max: 53, juz: 25 },
+      { no: 43, surah: "Az-Zukhruf", min: 1, max: 89, juz: 25 },
+      { no: 44, surah: "Ad-Dukhan", min: 1, max: 59, juz: 25 },
+      { no: 45, surah: "Al-Jasiyah", min: 1, max: 37, juz: 25 },
+      { no: 46, surah: "Al-Ahqaf", min: 1, max: 35, juz: 26 },
+      { no: 47, surah: "Muhammad", min: 1, max: 38, juz: 26 },
+      { no: 48, surah: "Al-Fath", min: 1, max: 29, juz: 26 },
+      { no: 49, surah: "Al-Hujurat", min: 1, max: 18, juz: 26 },
+      { no: 50, surah: "Qaf", min: 1, max: 45, juz: 26 },
+      { no: 51, surah: "Az-Zariyat", min: 1, max: 30, juz: 26 },
+      { no: 51, surah: "Az-Zariyat", min: 31, max: 60, juz: 27 },
+      { no: 52, surah: "At-Tur", min: 1, max: 49, juz: 27 },
+      { no: 53, surah: "An-Najm", min: 1, max: 62, juz: 27 },
+      { no: 54, surah: "Al-Qamar", min: 1, max: 55, juz: 27 },
+      { no: 55, surah: "Ar-Rahman", min: 1, max: 78, juz: 27 },
+      { no: 56, surah: "Al-Waqi'ah", min: 1, max: 96, juz: 27 },
+      { no: 57, surah: "Al-Hadid", min: 1, max: 29, juz: 27 },
+      { no: 58, surah: "Al-Mujadilah", min: 1, max: 22, juz: 28 },
+      { no: 59, surah: "Al-Hasyr", min: 1, max: 24, juz: 28 },
+      { no: 60, surah: "Al-Mumtahanah", min: 1, max: 13, juz: 28 },
+      { no: 61, surah: "As-Saff", min: 1, max: 14, juz: 28 },
+      { no: 62, surah: "Al-Jumu'ah", min: 1, max: 11, juz: 28 },
+      { no: 63, surah: "Al-Munafiqun", min: 1, max: 11, juz: 28 },
+      { no: 64, surah: "At-Tagabun", min: 1, max: 18, juz: 28 },
+      { no: 65, surah: "At-Talaq", min: 1, max: 12, juz: 28 },
+      { no: 66, surah: "At-Tahrim", min: 1, max: 12, juz: 28 },
+      { no: 67, surah: "Al-Mulk", min: 1, max: 30, juz: 29 },
+      { no: 68, surah: "Al-Qalam", min: 1, max: 52, juz: 29 },
+      { no: 69, surah: "Al-Haqqah", min: 1, max: 52, juz: 29 },
+      { no: 70, surah: "Al-Ma'arij", min: 1, max: 44, juz: 29 },
+      { no: 71, surah: "Nuh", min: 1, max: 28, juz: 29 },
+      { no: 72, surah: "Al-Jinn", min: 1, max: 28, juz: 29 },
+      { no: 73, surah: "Al-Muzzammil", min: 1, max: 20, juz: 29 },
+      { no: 74, surah: "Al-Muddassir", min: 1, max: 56, juz: 29 },
+      { no: 75, surah: "Al-Qiyamah", min: 1, max: 40, juz: 29 },
+      { no: 76, surah: "Al-Insan", min: 1, max: 31, juz: 29 },
+      { no: 77, surah: "Al-Mursalat", min: 1, max: 50, juz: 29 },
+      { no: 78, surah: "An-Naba'", min: 1, max: 40, juz: 30 },
+      { no: 79, surah: "An-Nazi'at", min: 1, max: 46, juz: 30 },
+      { no: 80, surah: "'Abasa", min: 1, max: 42, juz: 30 },
+      { no: 81, surah: "At-Takwir", min: 1, max: 29, juz: 30 },
+      { no: 82, surah: "Al-Infitar", min: 1, max: 19, juz: 30 },
+      { no: 83, surah: "Al-Mutaffifin", min: 1, max: 36, juz: 30 },
+      { no: 84, surah: "Al-Insyiqaq", min: 1, max: 25, juz: 30 },
+      { no: 85, surah: "Al-Buruj", min: 1, max: 22, juz: 30 },
+      { no: 86, surah: "At-Tariq", min: 1, max: 17, juz: 30 },
+      { no: 87, surah: "Al-A'la", min: 1, max: 19, juz: 30 },
+      { no: 88, surah: "Al-Gasyiyah", min: 1, max: 26, juz: 30 },
+      { no: 89, surah: "Al-Fajr", min: 1, max: 30, juz: 30 },
+      { no: 90, surah: "Al-Balad", min: 1, max: 20, juz: 30 },
+      { no: 91, surah: "Asy-Syams", min: 1, max: 15, juz: 30 },
+      { no: 92, surah: "Al-Lail", min: 1, max: 21, juz: 30 },
+      { no: 93, surah: "Ad-Duha", min: 1, max: 11, juz: 30 },
+      { no: 94, surah: "Asy-Syarh", min: 1, max: 8, juz: 30 },
+      { no: 95, surah: "At-Tin", min: 1, max: 8, juz: 30 },
+      { no: 96, surah: "Al-'Alaq", min: 1, max: 19, juz: 30 },
+      { no: 97, surah: "Al-Qadr", min: 1, max: 5, juz: 30 },
+      { no: 98, surah: "Al-Bayyinah", min: 1, max: 8, juz: 30 },
+      { no: 99, surah: "Az-Zalzalah", min: 1, max: 8, juz: 30 },
+      { no: 100, surah: "Al-'Adiyat", min: 1, max: 11, juz: 30 },
+      { no: 101, surah: "Al-Qari'ah", min: 1, max: 11, juz: 30 },
+      { no: 102, surah: "At-Takasur", min: 1, max: 8, juz: 30 },
+      { no: 103, surah: "Al-'Asr", min: 1, max: 3, juz: 30 },
+      { no: 104, surah: "Al-Humazah", min: 1, max: 9, juz: 30 },
+      { no: 105, surah: "Al-Fil", min: 1, max: 5, juz: 30 },
+      { no: 106, surah: "Quraisy", min: 1, max: 4, juz: 30 },
+      { no: 107, surah: "Al-Ma'un", min: 1, max: 7, juz: 30 },
+      { no: 108, surah: "Al-Kausar", min: 1, max: 3, juz: 30 },
+      { no: 109, surah: "Al-Kafirun", min: 1, max: 6, juz: 30 },
+      { no: 110, surah: "An-Nasr", min: 1, max: 3, juz: 30 },
+      { no: 111, surah: "Al-Lahab", min: 1, max: 5, juz: 30 },
+      { no: 112, surah: "Al-Ikhlas", min: 1, max: 4, juz: 30 },
+      { no: 113, surah: "Al-Falaq", min: 1, max: 5, juz: 30 },
+      { no: 114, surah: "An-Nas", min: 1, max: 6, juz: 30 }
+    ];
 
+    const STORAGE_KEYS = { PIN: 'hq_session_pin_v4' };
     const state = {
-      apiUrl: localStorage.getItem(STORAGE_KEYS.API_URL) || DEFAULT_API_URL,
       pin: sessionStorage.getItem(STORAGE_KEYS.PIN) || '',
-      isDemo: false,
       events: [],
       attendees: [],
       logs: [],
-      activeEventId: '',
-      qrScanner: null,
-      scanning: false,
-      lastScanCode: '',
-      lastScanAt: 0
+      activeDate: new Date().toISOString().slice(0, 10),
+      currentStudent: null
     };
 
     const $ = (id) => document.getElementById(id);
@@ -893,84 +785,25 @@
       }[m]));
     }
 
-    function playBeep(ok = true) {
-      try {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = 'sine';
-        osc.frequency.value = ok ? 880 : 280;
-        gain.gain.value = 0.08;
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start();
-        osc.stop(ctx.currentTime + (ok ? 0.12 : 0.25));
-      } catch (_) {}
-    }
-
-    /* ==================== DATA DEMO LOKAL ==================== */
-    function getDemoStore() {
-      const raw = localStorage.getItem(STORAGE_KEYS.DEMO_DATA);
-      if (raw) return JSON.parse(raw);
-      const today = new Date().toISOString().slice(0, 10);
-      const seed = {
-        events: [
-          { eventId: 'HQ-HARI-INI', eventName: "Halaqah Himalatul Qur'an (Hari Ini)", date: today, startTime: '08:00', lateCutoffTime: '08:15' }
-        ],
-        attendees: [
-          { attendeeId: 'HQ-001', fullName: 'DAHLIA', contact: '', groupType: "HIMALATUL QUR'AN" },
-          { attendeeId: 'HQ-002', fullName: 'FITRIATI SULAIMAN', contact: '', groupType: "HIMALATUL QUR'AN" },
-          { attendeeId: 'HQ-003', fullName: 'NURHALIMAH', contact: '', groupType: "HIMALATUL QUR'AN" },
-          { attendeeId: 'HQ-004', fullName: 'SHOFIE', contact: '', groupType: "HIMALATUL QUR'AN" },
-          { attendeeId: 'HQ-005', fullName: 'LILYANA', contact: '', groupType: "HIMALATUL QUR'AN" },
-          { attendeeId: 'HQ-006', fullName: 'WAHIDA', contact: '', groupType: "HIMALATUL QUR'AN" }
-        ],
-        logs: []
-      };
-      localStorage.setItem(STORAGE_KEYS.DEMO_DATA, JSON.stringify(seed));
-      return seed;
-    }
-
-    function saveDemoStore(store) {
-      localStorage.setItem(STORAGE_KEYS.DEMO_DATA, JSON.stringify(store));
+    function normalizeStatus(st) {
+      if (st === 'Present' || st === 'Terlambat' || st === 'Late') return 'Hadir';
+      if (st === 'Excused') return 'Izin';
+      if (st === 'Absent') return 'Alpha';
+      return st || 'Belum';
     }
 
     /* ==================== KLIEN API ==================== */
     async function apiGet(action, params = {}) {
-      if (state.isDemo) {
-        const store = getDemoStore();
-        const storedPin = localStorage.getItem(STORAGE_KEYS.DEMO_PIN) || '1234';
-        if (action === 'verifyPin') {
-          const valid = params.pin === storedPin;
-          return { success: valid, authenticated: valid, message: valid ? 'PIN valid.' : 'PIN Admin salah.' };
-        }
-        if (action === 'studentLogin') {
-          const uname = String(params.username || '').trim().toLowerCase();
-          const pass = String(params.password || '').trim();
-          const student = store.attendees.find((a) => a.fullName.trim().toLowerCase() === uname);
-          if (!student) return { success: false, message: 'Nama santri tidak ditemukan.' };
-          const expected = student.fullName.trim().toLowerCase().split(/\s+/)[0] + '1234';
-          if (pass !== expected) return { success: false, message: 'Password salah.' };
-          const logs = store.logs.filter((l) => l.attendeeId.toLowerCase() === student.attendeeId.toLowerCase());
-          return { success: true, role: 'student', attendee: student, events: store.events, logs };
-        }
-        if (action === 'getAll') return { success: true, ...store };
-        return { success: false, message: 'Aksi demo tidak dikenal' };
-      }
-
-      const url = new URL(state.apiUrl);
+      const url = new URL(FIXED_API_URL);
       url.searchParams.set('action', action);
-      url.searchParams.set('pin', params.pin || state.pin);
+      if (state.pin) url.searchParams.set('pin', state.pin);
       Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
-
       const res = await fetch(url.toString(), { method: 'GET', redirect: 'follow' });
       return res.json();
     }
 
     async function apiPost(action, payload = {}) {
-      if (state.isDemo) return handleDemoPost(action, payload);
-
-      const res = await fetch(state.apiUrl, {
+      const res = await fetch(FIXED_API_URL, {
         method: 'POST',
         redirect: 'follow',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -979,196 +812,65 @@
       return res.json();
     }
 
-    function handleDemoPost(action, body) {
-      const store = getDemoStore();
-      const nowIso = new Date().toISOString();
-
-      if (action === 'updatePin') {
-        if (!body.newPin || body.newPin.length < 4) return { success: false, message: 'PIN minimal 4 karakter.' };
-        localStorage.setItem(STORAGE_KEYS.DEMO_PIN, body.newPin);
-        return { success: true, message: 'PIN Demo berhasil diperbarui.' };
-      }
-      if (action === 'createEvent') {
-        const ev = { ...body.event, eventId: 'SESI-' + Math.random().toString(36).slice(2, 7).toUpperCase() };
-        store.events.push(ev);
-        saveDemoStore(store);
-        return { success: true, event: ev, message: 'Sesi halaqah berhasil dibuat.' };
-      }
-      if (action === 'updateEvent') {
-        const idx = store.events.findIndex((e) => e.eventId === body.event.eventId);
-        if (idx >= 0) store.events[idx] = { ...store.events[idx], ...body.event };
-        saveDemoStore(store);
-        return { success: true, message: 'Sesi halaqah berhasil diperbarui.' };
-      }
-      if (action === 'deleteEvent') {
-        store.events = store.events.filter((e) => e.eventId !== body.eventId);
-        saveDemoStore(store);
-        return { success: true, message: 'Sesi halaqah dihapus.' };
-      }
-      if (action === 'createAttendee') {
-        const id = body.attendee.attendeeId || 'SANTRI-' + Math.random().toString(36).slice(2, 7).toUpperCase();
-        if (store.attendees.some((a) => a.attendeeId.toLowerCase() === id.toLowerCase())) {
-          return { success: false, message: 'ID Santri sudah terdaftar.' };
-        }
-        const att = { ...body.attendee, attendeeId: id };
-        store.attendees.push(att);
-        saveDemoStore(store);
-        return { success: true, attendee: att, message: 'Data santri berhasil ditambahkan.' };
-      }
-      if (action === 'updateAttendee') {
-        const idx = store.attendees.findIndex((a) => a.attendeeId === body.attendee.attendeeId);
-        if (idx >= 0) store.attendees[idx] = { ...store.attendees[idx], ...body.attendee };
-        saveDemoStore(store);
-        return { success: true, message: 'Data santri berhasil diperbarui.' };
-      }
-      if (action === 'deleteAttendee') {
-        store.attendees = store.attendees.filter((a) => a.attendeeId !== body.attendeeId);
-        saveDemoStore(store);
-        return { success: true, message: 'Data santri dihapus.' };
-      }
-      if (action === 'bulkImportAttendees') {
-        let imported = 0, skipped = 0;
-        const ids = new Set(store.attendees.map((a) => a.attendeeId.toLowerCase()));
-        body.attendees.forEach((a) => {
-          if (!a.fullName) { skipped++; return; }
-          const id = a.attendeeId || 'SANTRI-' + Math.random().toString(36).slice(2, 7).toUpperCase();
-          if (ids.has(id.toLowerCase())) { skipped++; return; }
-          ids.add(id.toLowerCase());
-          store.attendees.push({ attendeeId: id, fullName: a.fullName, contact: a.contact || '', groupType: a.groupType || 'Reguler' });
-          imported++;
-        });
-        saveDemoStore(store);
-        return { success: true, imported, skipped, message: `Berhasil mengimpor ${imported} santri (${skipped} dilewati).` };
-      }
-      if (action === 'checkIn') {
-        const ev = store.events.find((e) => e.eventId === body.eventId);
-        const att = store.attendees.find((a) => a.attendeeId.toLowerCase() === String(body.attendeeId).toLowerCase());
-        if (!ev) return { success: false, message: 'Sesi tidak ditemukan.' };
-        if (!att) return { success: false, message: `ID Santri "${body.attendeeId}" tidak terdaftar.` };
-        const existing = store.logs.find((l) => l.eventId === ev.eventId && l.attendeeId === att.attendeeId);
-        if (existing && (existing.status === 'Hadir' || existing.status === 'Terlambat')) {
-          return { success: false, duplicate: true, message: `${att.fullName} sudah tercatat absen (${existing.status}).` };
-        }
-        const cutoff = new Date(`${ev.date}T${ev.lateCutoffTime}:00`);
-        const now = new Date();
-        const isLate = !isNaN(cutoff) && now > cutoff;
-        const status = isLate ? 'Terlambat' : 'Hadir';
-        const minutesLate = isLate ? Math.max(1, Math.ceil((now - cutoff) / 60000)) : 0;
-        if (existing) {
-          Object.assign(existing, { status, checkInTimestamp: nowIso, minutesLate, updatedAt: nowIso });
-        } else {
-          store.logs.push({
-            logId: 'LOG-' + Math.random().toString(36).slice(2, 7).toUpperCase(),
-            eventId: ev.eventId, attendeeId: att.attendeeId, fullName: att.fullName,
-            status, checkInTimestamp: nowIso, minutesLate,
-            surah: '', ayat: '', juz: '', jenisSetoran: '', nilai: '', notes: '', updatedAt: nowIso
-          });
-        }
-        saveDemoStore(store);
-        return { success: true, message: `${att.fullName} tercatat ${status}${minutesLate ? ` (${minutesLate} menit)` : ''}.` };
-      }
-      if (action === 'markStatus') {
-        const att = store.attendees.find((a) => a.attendeeId === body.attendeeId);
-        if (!att) return { success: false, message: 'Santri tidak ditemukan.' };
-        const existing = store.logs.find((l) => l.eventId === body.eventId && l.attendeeId === att.attendeeId);
-        const ts = (body.status === 'Hadir' || body.status === 'Terlambat') ? (existing?.checkInTimestamp || nowIso) : '';
-        if (existing) {
-          Object.assign(existing, { status: body.status, checkInTimestamp: ts, updatedAt: nowIso });
-        } else {
-          store.logs.push({
-            logId: 'LOG-' + Math.random().toString(36).slice(2, 7).toUpperCase(),
-            eventId: body.eventId, attendeeId: att.attendeeId, fullName: att.fullName,
-            status: body.status, checkInTimestamp: ts, minutesLate: 0,
-            surah: '', ayat: '', juz: '', jenisSetoran: '', nilai: '', notes: '', updatedAt: nowIso
-          });
-        }
-        saveDemoStore(store);
-        return { success: true, message: `${att.fullName} ditandai ${body.status}.` };
-      }
-      if (action === 'saveSetoran') {
-        const ev = store.events.find((e) => e.eventId === body.eventId);
-        const att = store.attendees.find((a) => a.attendeeId === body.attendeeId);
-        if (!ev || !att) return { success: false, message: 'Sesi atau santri tidak ditemukan.' };
-        const existing = store.logs.find((l) => l.eventId === ev.eventId && l.attendeeId === att.attendeeId);
-        const fields = {
-          surah: body.surah, ayat: body.ayat, juz: body.juz,
-          jenisSetoran: body.jenisSetoran, nilai: body.nilai, notes: body.notes || '', updatedAt: nowIso
-        };
-        if (existing) {
-          Object.assign(existing, fields);
-        } else {
-          const cutoff = new Date(`${ev.date}T${ev.lateCutoffTime}:00`);
-          const now = new Date();
-          const isLate = !isNaN(cutoff) && now > cutoff;
-          store.logs.push({
-            logId: 'LOG-' + Math.random().toString(36).slice(2, 7).toUpperCase(),
-            eventId: ev.eventId, attendeeId: att.attendeeId, fullName: att.fullName,
-            status: isLate ? 'Terlambat' : 'Hadir',
-            checkInTimestamp: nowIso,
-            minutesLate: isLate ? Math.max(1, Math.ceil((now - cutoff) / 60000)) : 0,
-            ...fields
-          });
-        }
-        saveDemoStore(store);
-        return { success: true, message: `Setoran hafalan ${att.fullName} berhasil disimpan.` };
-      }
-      return { success: false, message: 'Aksi tidak dikenal.' };
-    }
-
     /* ==================== OTENTIKASI (ADMIN & SANTRI) ==================== */
-    let currentStudent = null;
-
-    $('modeAdminBtn').addEventListener('click', () => {
-      $('modeAdminBtn').classList.add('active');
-      $('modeStudentBtn').classList.remove('active');
-      $('loginForm').classList.remove('hidden');
-      $('studentLoginForm').classList.add('hidden');
-      $('loginError').classList.add('hidden');
-    });
-
-    $('modeStudentBtn').addEventListener('click', () => {
-      $('modeStudentBtn').classList.add('active');
-      $('modeAdminBtn').classList.remove('active');
-      $('studentLoginForm').classList.remove('hidden');
-      $('loginForm').classList.add('hidden');
-      $('loginError').classList.add('hidden');
-    });
-
-    $('studentLoginForm').addEventListener('submit', async (e) => {
+    $('loginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       $('loginError').classList.add('hidden');
-      $('studentLoginBtn').disabled = true;
-      $('studentLoginBtn').textContent = 'Memeriksa...';
+      $('loginBtn').disabled = true;
+      $('loginBtn').textContent = 'Memeriksa...';
+
+      const username = $('usernameInput').value.trim().toLowerCase();
+      const password = $('passwordInput').value.trim();
+
       try {
-        state.apiUrl = $('apiUrlInput').value.trim();
-        state.isDemo = !state.apiUrl;
-        const res = await apiGet('studentLogin', {
-          username: $('studentUsernameInput').value.trim(),
-          password: $('studentPasswordInput').value.trim()
-        });
-        if (!res.success) throw new Error(res.message || 'Login gagal.');
-
-        currentStudent = res.attendee;
-        state.events = (res.events || []).sort((a, b) => (b.date + b.startTime).localeCompare(a.date + a.startTime));
-        state.logs = res.logs || [];
-
-        $('authScreen').classList.add('hidden');
-        $('studentShell').classList.remove('hidden');
-        $('studentHeaderName').textContent = currentStudent.fullName;
-        $('studentHeaderMeta').textContent = `${currentStudent.attendeeId} · ${currentStudent.groupType || "HIMALATUL QUR'AN"}`;
-        $('studentMonthFilter').value = '';
-        renderStudentDashboard();
+        if (username === 'admin') {
+          const res = await apiGet('verifyPin', { pin: password });
+          if (!res.success) throw new Error(res.message || 'Password Admin salah.');
+          state.pin = password;
+          sessionStorage.setItem(STORAGE_KEYS.PIN, password);
+          $('authScreen').classList.add('hidden');
+          $('appShell').classList.remove('hidden');
+          await loadAllData();
+        } else {
+          const res = await apiGet('studentLogin', { username, password });
+          if (!res.success) throw new Error(res.message || 'Username atau password salah.');
+          state.currentStudent = res.attendee;
+          state.events = res.events || [];
+          state.logs = res.logs || [];
+          $('authScreen').classList.add('hidden');
+          $('studentShell').classList.remove('hidden');
+          $('studentHeaderName').textContent = state.currentStudent.fullName;
+          $('studentHeaderMeta').textContent = `${state.currentStudent.attendeeId} · ${state.currentStudent.groupType || "HIMALATUL QUR'AN"}`;
+          $('studentMonthFilter').value = '';
+          renderStudentDashboard();
+        }
       } catch (err) {
         $('loginError').textContent = err.message || 'Gagal masuk.';
         $('loginError').classList.remove('hidden');
       } finally {
-        $('studentLoginBtn').disabled = false;
-        $('studentLoginBtn').textContent = 'Lihat Data Saya';
+        $('loginBtn').disabled = false;
+        $('loginBtn').textContent = 'Masuk';
       }
     });
 
+    $('logoutBtn').addEventListener('click', () => {
+      sessionStorage.removeItem(STORAGE_KEYS.PIN);
+      state.pin = '';
+      $('passwordInput').value = '';
+      $('appShell').classList.add('hidden');
+      $('authScreen').classList.remove('hidden');
+    });
+
+    $('studentLogoutBtn').addEventListener('click', () => {
+      state.currentStudent = null;
+      $('passwordInput').value = '';
+      $('studentShell').classList.add('hidden');
+      $('authScreen').classList.remove('hidden');
+    });
+
+    /* ==================== DASBOR SANTRI (READ-ONLY) ==================== */
     function renderStudentDashboard() {
-      if (!currentStudent) return;
+      if (!state.currentStudent) return;
       const monthFilter = $('studentMonthFilter').value;
       const evMap = new Map(state.events.map((e) => [e.eventId, e]));
 
@@ -1179,49 +881,48 @@
         return String(dt).startsWith(monthFilter);
       });
 
-      let hadir = 0, terlambat = 0, izin = 0, alpha = 0, setoran = 0;
+      const seenEventIds = new Set();
+      let hadir = 0, izin = 0, alpha = 0, setoran = 0;
       myLogs.forEach((l) => {
-        const st = normalizeStatus(l.status);
-        if (st === 'Hadir') hadir++;
-        else if (st === 'Terlambat') terlambat++;
-        else if (st === 'Izin') izin++;
-        else if (st === 'Alpha') alpha++;
-        if (l.surah || l.notes) setoran++;
+        if (!seenEventIds.has(l.eventId)) {
+          seenEventIds.add(l.eventId);
+          const st = normalizeStatus(l.status);
+          if (st === 'Hadir') hadir++;
+          else if (st === 'Izin') izin++;
+          else if (st === 'Alpha') alpha++;
+        }
+        if (l.surah) setoran++;
       });
 
       $('stStatHadir').textContent = hadir;
-      $('stStatTerlambat').textContent = terlambat;
       $('stStatIzin').textContent = izin;
       $('stStatAlpha').textContent = alpha;
       $('stStatSetoran').textContent = setoran;
 
       const tbody = $('studentHistoryBody');
       if (myLogs.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--text-muted);">Belum ada catatan kehadiran atau setoran pada periode ini.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:var(--text-muted);">Belum ada rekap absensi atau setoran pada periode ini.</td></tr>';
         return;
       }
 
-      const sortedLogs = [...myLogs].sort((a, b) => {
-        const da = evMap.get(a.eventId)?.date || a.checkInTimestamp || '';
-        const db = evMap.get(b.eventId)?.date || b.checkInTimestamp || '';
+      const sorted = [...myLogs].sort((a, b) => {
+        const da = evMap.get(a.eventId)?.date || (a.checkInTimestamp || '').slice(0, 10);
+        const db = evMap.get(b.eventId)?.date || (b.checkInTimestamp || '').slice(0, 10);
         return db.localeCompare(da);
       });
 
-      tbody.innerHTML = sortedLogs.map((l) => {
+      tbody.innerHTML = sorted.map((l) => {
         const ev = evMap.get(l.eventId);
         const st = normalizeStatus(l.status);
-        const badgeClass = `badge-${st.toLowerCase()}`;
         return `
           <tr>
-            <td>
-              <strong>${escapeHtml(ev ? ev.date : (l.checkInTimestamp || '').slice(0, 10))}</strong>
-              <div style="font-size:0.74rem; color:var(--text-muted);">${escapeHtml(ev ? ev.eventName : l.eventId)}</div>
-            </td>
-            <td><span class="badge ${badgeClass}">${escapeHtml(st)}</span></td>
-            <td><strong>${escapeHtml(l.surah || '-')}</strong>${l.ayat ? ` : ${escapeHtml(l.ayat)}` : ''}</td>
+            <td><strong>${escapeHtml(ev ? ev.date : (l.checkInTimestamp || '').slice(0, 10))}</strong></td>
+            <td><span class="badge badge-${st.toLowerCase()}">${escapeHtml(st)}</span></td>
+            <td><strong>${escapeHtml(l.surah || '-')}</strong></td>
+            <td>${escapeHtml(l.ayat || '-')}</td>
             <td>${escapeHtml(l.juz || '-')}</td>
             <td>${escapeHtml(l.jenisSetoran || '-')}</td>
-            <td>${escapeHtml(l.nilai || '-')}</td>
+            <td>${escapeHtml(l.kesalahanBaca || '0')}</td>
             <td style="font-size:0.78rem;">${escapeHtml(l.notes || '-')}</td>
           </tr>
         `;
@@ -1234,72 +935,7 @@
       renderStudentDashboard();
     });
 
-    $('studentShowQrBtn').addEventListener('click', () => {
-      if (!currentStudent) return;
-      $('badgeGroup').textContent = currentStudent.groupType || "HIMALATUL QUR'AN";
-      $('badgeName').textContent = currentStudent.fullName;
-      $('badgeId').textContent = currentStudent.attendeeId;
-      const container = $('qrBadgeCanvas');
-      container.innerHTML = '';
-      if (typeof QRCode !== 'undefined') {
-        new QRCode(container, { text: currentStudent.attendeeId, width: 180, height: 180 });
-      } else {
-        container.textContent = currentStudent.attendeeId;
-      }
-      $('qrModal').classList.remove('hidden');
-    });
-
-    $('studentLogoutBtn').addEventListener('click', () => {
-      currentStudent = null;
-      $('studentPasswordInput').value = '';
-      $('studentShell').classList.add('hidden');
-      $('authScreen').classList.remove('hidden');
-    });
-
-    async function attemptLogin(apiUrl, pin) {
-      state.apiUrl = apiUrl.trim();
-      state.isDemo = !state.apiUrl;
-      state.pin = pin.trim();
-
-      const res = await apiGet('verifyPin', { pin: state.pin });
-      if (!res.success) throw new Error(res.message || 'PIN salah');
-
-      localStorage.setItem(STORAGE_KEYS.API_URL, state.apiUrl);
-      sessionStorage.setItem(STORAGE_KEYS.PIN, state.pin);
-
-      $('authScreen').classList.add('hidden');
-      $('appShell').classList.remove('hidden');
-      $('demoBanner').classList.toggle('hidden', !state.isDemo);
-
-      await loadAllData();
-    }
-
-    $('loginForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      $('loginError').classList.add('hidden');
-      $('loginBtn').disabled = true;
-      $('loginBtn').textContent = 'Memverifikasi...';
-      try {
-        await attemptLogin($('apiUrlInput').value, $('pinInput').value);
-      } catch (err) {
-        $('loginError').textContent = err.message || 'Gagal terhubung. Periksa URL dan PIN.';
-        $('loginError').classList.remove('hidden');
-      } finally {
-        $('loginBtn').disabled = false;
-        $('loginBtn').textContent = 'Buka Dasbor';
-      }
-    });
-
-    $('logoutBtn').addEventListener('click', () => {
-      stopQrScanner();
-      sessionStorage.removeItem(STORAGE_KEYS.PIN);
-      state.pin = '';
-      $('pinInput').value = '';
-      $('appShell').classList.add('hidden');
-      $('authScreen').classList.remove('hidden');
-    });
-
-    /* ==================== SINKRONISASI & RENDER ==================== */
+    /* ==================== DATA & NAVIGASI ADMIN ==================== */
     async function loadAllData() {
       try {
         const res = await apiGet('getAll');
@@ -1307,14 +943,9 @@
           toast(res.message || 'Gagal memuat data.', 'error');
           return;
         }
-        state.events = (res.events || []).sort((a, b) => (b.date + b.startTime).localeCompare(a.date + a.startTime));
+        state.events = res.events || [];
         state.attendees = res.attendees || [];
         state.logs = res.logs || [];
-
-        if (!state.activeEventId || !state.events.some((e) => e.eventId === state.activeEventId)) {
-          state.activeEventId = state.events[0]?.eventId || '';
-        }
-
         renderAll();
       } catch (err) {
         toast('Kesalahan sinkronisasi: ' + err.message, 'error');
@@ -1322,14 +953,11 @@
     }
 
     function renderAll() {
-      renderEventSelector();
       renderCheckInTab();
-      renderEventsTable();
       renderAttendeesTable();
       renderReports();
     }
 
-    /* ==================== NAVIGASI TAB ==================== */
     document.querySelectorAll('.nav-tab').forEach((btn) => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.nav-tab').forEach((b) => b.classList.remove('active'));
@@ -1337,62 +965,41 @@
         const target = btn.dataset.tab;
         document.querySelectorAll('.tab-panel').forEach((p) => p.classList.add('hidden'));
         $('tab-' + target).classList.remove('hidden');
-        if (target !== 'checkin') stopQrScanner();
       });
     });
 
     /* ==================== TAB 1: ABSENSI & SETORAN ==================== */
-    function renderEventSelector() {
-      const sel = $('activeEventSelect');
-      if (state.events.length === 0) {
-        sel.innerHTML = '<option value="">Belum ada jadwal sesi</option>';
-        $('activeEventMeta').textContent = 'Buka tab Jadwal Sesi untuk membuat sesi halaqah pertama.';
-        return;
-      }
-      sel.innerHTML = state.events.map((ev) =>
-        `<option value="${escapeHtml(ev.eventId)}" ${ev.eventId === state.activeEventId ? 'selected' : ''}>
-          ${escapeHtml(ev.eventName)} (${escapeHtml(ev.date)})
-        </option>`
-      ).join('');
-
-      const active = state.events.find((e) => e.eventId === state.activeEventId);
-      if (active) {
-        $('activeEventMeta').innerHTML =
-          `<strong>Tanggal:</strong> ${escapeHtml(active.date)} &nbsp;|&nbsp; <strong>Mulai:</strong> ${escapeHtml(active.startTime)} &nbsp;|&nbsp; <strong>Batas Terlambat:</strong> ${escapeHtml(active.lateCutoffTime)}`;
-      }
+    function getActiveEventIdsForDate(dateStr) {
+      return new Set(state.events.filter((e) => e.date === dateStr).map((e) => e.eventId));
     }
 
-    $('activeEventSelect').addEventListener('change', (e) => {
-      state.activeEventId = e.target.value;
-      renderEventSelector();
+    function getPrimaryEventIdForDate(dateStr) {
+      const ev = state.events.find((e) => e.date === dateStr);
+      return ev ? ev.eventId : `TGL-${dateStr}`;
+    }
+
+    $('activeDateInput').addEventListener('change', (e) => {
+      state.activeDate = e.target.value || new Date().toISOString().slice(0, 10);
       renderCheckInTab();
     });
-
-    function normalizeStatus(st) {
-      if (st === 'Present') return 'Hadir';
-      if (st === 'Late') return 'Terlambat';
-      if (st === 'Excused') return 'Izin';
-      if (st === 'Absent') return 'Alpha';
-      return st || 'Belum';
-    }
+    $('manualSearchInput').addEventListener('input', renderCheckInTab);
 
     function renderCheckInTab() {
-      const eventLogs = state.logs.filter((l) => l.eventId === state.activeEventId);
-      const logMap = new Map(eventLogs.map((l) => [l.attendeeId.toLowerCase(), l]));
+      const dateStr = state.activeDate;
+      const evIds = getActiveEventIdsForDate(dateStr);
+      const dayLogs = state.logs.filter((l) => evIds.has(l.eventId));
 
-      let hadir = 0, terlambat = 0, izin = 0, alpha = 0, setoranCount = 0;
+      let hadir = 0, izin = 0, alpha = 0, setoranCount = 0;
       state.attendees.forEach((att) => {
-        const log = logMap.get(att.attendeeId.toLowerCase());
-        const st = log ? normalizeStatus(log.status) : 'Belum';
+        const attLogs = dayLogs.filter((l) => l.attendeeId.toLowerCase() === att.attendeeId.toLowerCase());
+        const st = attLogs.length > 0 ? normalizeStatus(attLogs[0].status) : 'Belum';
         if (st === 'Hadir') hadir++;
-        else if (st === 'Terlambat') terlambat++;
         else if (st === 'Izin') izin++;
         else alpha++;
-        if (log && log.surah) setoranCount++;
+        setoranCount += attLogs.filter((l) => l.surah).length;
       });
 
       $('statPresent').textContent = hadir;
-      $('statLate').textContent = terlambat;
       $('statExcused').textContent = izin;
       $('statAbsent').textContent = alpha;
       $('statSetoran').textContent = setoranCount;
@@ -1410,32 +1017,27 @@
       }
 
       tbody.innerHTML = filtered.map((att) => {
-        const log = logMap.get(att.attendeeId.toLowerCase());
-        const status = log ? normalizeStatus(log.status) : 'Belum';
+        const attLogs = dayLogs.filter((l) => l.attendeeId.toLowerCase() === att.attendeeId.toLowerCase());
+        const status = attLogs.length > 0 ? normalizeStatus(attLogs[0].status) : 'Belum';
         const badgeClass = `badge-${status.toLowerCase()}`;
-        const lateNote = log && status === 'Terlambat' && log.minutesLate ? ` (${log.minutesLate}m)` : '';
-        const timeStr = log && log.checkInTimestamp ? new Date(log.checkInTimestamp).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : '';
-        const setoranInfo = log && log.surah
-          ? `<div style="font-size:0.75rem; color:var(--primary); font-weight:600; margin-top:2px;">📖 ${escapeHtml(log.surah)}${log.ayat ? ' : ' + escapeHtml(log.ayat) : ''} · ${escapeHtml(log.jenisSetoran || 'Ziyadah')} (${escapeHtml(log.nilai || '-')})</div>`
-          : '';
+        const setoranBadges = attLogs.filter((l) => l.surah).map((l) =>
+          `<div style="font-size:0.75rem; color:var(--primary); font-weight:600; margin-top:2px;">📖 ${escapeHtml(l.surah)}${l.ayat ? ' (' + escapeHtml(l.ayat) + ')' : ''} · Juz ${escapeHtml(l.juz || '-')} · ${escapeHtml(l.jenisSetoran || 'Ziyadah')} · Salah: ${escapeHtml(l.kesalahanBaca || '0')}</div>`
+        ).join('');
 
         return `
           <tr>
             <td>
               <div style="font-weight:700;">${escapeHtml(att.fullName)}</div>
               <div style="font-size:0.75rem; color:var(--text-muted);">${escapeHtml(att.attendeeId)} · ${escapeHtml(att.groupType)}</div>
-              ${setoranInfo}
+              ${setoranBadges}
             </td>
-            <td>
-              <span class="badge ${badgeClass}">${escapeHtml(status)}${lateNote}</span>
-              ${timeStr ? `<div style="font-size:0.72rem; color:var(--text-muted); margin-top:2px;">${timeStr}</div>` : ''}
-            </td>
+            <td><span class="badge ${badgeClass}">${escapeHtml(status)}</span></td>
             <td>
               <div style="display:flex; gap:4px; flex-wrap:wrap;">
-                <button class="btn-success btn-sm" onclick="performCheckIn('${escapeHtml(att.attendeeId)}')" ${!state.activeEventId ? 'disabled' : ''}>Hadir</button>
-                <button class="btn-primary btn-sm" onclick="openSetoranModal('${escapeHtml(att.attendeeId)}')" ${!state.activeEventId ? 'disabled' : ''}>📖 Setoran</button>
-                <button class="btn-info btn-sm" onclick="markStatus('${escapeHtml(att.attendeeId)}','Izin')" ${!state.activeEventId ? 'disabled' : ''}>Izin</button>
-                <button class="btn-danger btn-sm" onclick="markStatus('${escapeHtml(att.attendeeId)}','Alpha')" ${!state.activeEventId ? 'disabled' : ''}>Alpha</button>
+                <button class="btn-success btn-sm" onclick="markStatus('${escapeHtml(att.attendeeId)}','Hadir')">Hadir</button>
+                <button class="btn-primary btn-sm" onclick="openSetoranModal('${escapeHtml(att.attendeeId)}')">📖 Catat Setoran</button>
+                <button class="btn-info btn-sm" onclick="markStatus('${escapeHtml(att.attendeeId)}','Izin')">Izin</button>
+                <button class="btn-danger btn-sm" onclick="markStatus('${escapeHtml(att.attendeeId)}','Alpha')">Alpha</button>
               </div>
             </td>
           </tr>
@@ -1443,40 +1045,10 @@
       }).join('');
     }
 
-    $('manualSearchInput').addEventListener('input', renderCheckInTab);
-
-    async function performCheckIn(attendeeId) {
-      if (!state.activeEventId) {
-        toast('Pilih sesi halaqah terlebih dahulu.', 'error');
-        return;
-      }
-      const fb = $('scanFeedback');
-      try {
-        const res = await apiPost('checkIn', { eventId: state.activeEventId, attendeeId });
-        fb.classList.remove('hidden');
-        if (res.success) {
-          playBeep(true);
-          fb.style.background = 'var(--success-bg)';
-          fb.style.color = '#166534';
-          fb.textContent = '✓ ' + res.message;
-          toast(res.message, 'success');
-          await loadAllData();
-        } else {
-          playBeep(false);
-          fb.style.background = res.duplicate ? 'var(--warning-bg)' : 'var(--danger-bg)';
-          fb.style.color = res.duplicate ? '#92400e' : '#991b1b';
-          fb.textContent = '⚠ ' + res.message;
-          toast(res.message, 'error');
-        }
-      } catch (err) {
-        toast('Gagal mencatat absensi: ' + err.message, 'error');
-      }
-    }
-
     async function markStatus(attendeeId, status) {
-      if (!state.activeEventId) return;
       try {
-        const res = await apiPost('markStatus', { eventId: state.activeEventId, attendeeId, status });
+        const eventId = getPrimaryEventIdForDate(state.activeDate);
+        const res = await apiPost('markStatus', { eventId, date: state.activeDate, attendeeId, status });
         if (res.success) {
           toast(res.message, 'success');
           await loadAllData();
@@ -1486,184 +1058,163 @@
       }
     }
 
-    $('quickCheckInBtn').addEventListener('click', () => {
-      const id = $('quickIdInput').value.trim();
-      if (!id) return;
-      $('quickIdInput').value = '';
-      performCheckIn(id);
-    });
-    $('quickIdInput').addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        $('quickCheckInBtn').click();
-      }
-    });
+    /* ==================== MODAL SETORAN MULTI-SURAH ==================== */
+    function buildSurahOptionsHtml() {
+      return QURAN_JUZ_ENTRIES.map((e, idx) =>
+        `<option value="${idx}">${e.no}. ${escapeHtml(e.surah)} (${e.min}–${e.max}) — Juz ${e.juz}</option>`
+      ).join('');
+    }
 
-    /* ==================== MODAL SETORAN HAFALAN ==================== */
+    function addSetoranItemRow() {
+      const container = $('setoranItemsContainer');
+      const rowDiv = document.createElement('div');
+      rowDiv.className = 'setoran-item-box';
+      rowDiv.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong style="font-size:0.84rem; color:var(--primary);">Setoran Surah</strong>
+          <button type="button" class="btn-danger btn-sm remove-item-btn">Hapus</button>
+        </div>
+        <div class="grid-2" style="gap:10px;">
+          <div>
+            <label>Nama Surah *</label>
+            <select class="item-surah-select" required>
+              <option value="">-- Pilih Surah &amp; Juz --</option>
+              ${buildSurahOptionsHtml()}
+            </select>
+          </div>
+          <div>
+            <label>Juz (Terisi Otomatis)</label>
+            <input type="text" class="item-juz-display" readonly style="background:var(--surface-alt); font-weight:700;" value="-" />
+          </div>
+        </div>
+        <div class="grid-3" style="gap:10px;">
+          <div>
+            <label>Ayat * <span class="item-ayat-hint" style="color:var(--primary); font-weight:700;"></span></label>
+            <input type="text" class="item-ayat-input" placeholder="cth. 1-15 atau 20" required />
+          </div>
+          <div>
+            <label>Jenis Setoran</label>
+            <select class="item-jenis-select">
+              <option value="Ziyadah">Ziyadah</option>
+              <option value="Murojaah">Murojaah</option>
+              <option value="Tasmi'">Tasmi'</option>
+              <option value="Ikhtibar">Ikhtibar</option>
+            </select>
+          </div>
+          <div>
+            <label>Kesalahan Baca</label>
+            <input type="number" class="item-salah-input" min="0" value="0" required />
+          </div>
+        </div>
+        <div>
+          <label>Catatan Pembimbing</label>
+          <input type="text" class="item-notes-input" />
+        </div>
+      `;
+
+      const selectEl = rowDiv.querySelector('.item-surah-select');
+      const juzEl = rowDiv.querySelector('.item-juz-display');
+      const hintEl = rowDiv.querySelector('.item-ayat-hint');
+
+      selectEl.addEventListener('change', () => {
+        if (selectEl.value === '') {
+          juzEl.value = '-';
+          hintEl.textContent = '';
+          return;
+        }
+        const entry = QURAN_JUZ_ENTRIES[Number(selectEl.value)];
+        juzEl.value = `Juz ${entry.juz}`;
+        hintEl.textContent = `(Ayat ${entry.min}–${entry.max})`;
+      });
+
+      rowDiv.querySelector('.remove-item-btn').addEventListener('click', () => {
+        if (container.children.length > 1) rowDiv.remove();
+        else toast('Minimal harus ada 1 baris setoran.', 'error');
+      });
+
+      container.appendChild(rowDiv);
+    }
+
     function openSetoranModal(attendeeId) {
-      if (!state.activeEventId) {
-        toast('Pilih sesi halaqah aktif terlebih dahulu.', 'error');
-        return;
-      }
       const att = state.attendees.find((a) => a.attendeeId === attendeeId);
       if (!att) return;
-      const existing = state.logs.find((l) => l.eventId === state.activeEventId && l.attendeeId.toLowerCase() === attendeeId.toLowerCase());
-
       $('setoranAttIdInput').value = att.attendeeId;
       $('setoranSantriName').textContent = att.fullName;
       $('setoranSantriId').textContent = att.attendeeId;
-      $('setoranSurah').value = existing?.surah || '';
-      $('setoranAyat').value = existing?.ayat || '';
-      $('setoranJuz').value = existing?.juz || '30';
-      $('setoranJenis').value = existing?.jenisSetoran || 'Ziyadah';
-      $('setoranNilai').value = existing?.nilai || 'Jayyid Jiddan (B)';
-      $('setoranNotes').value = existing?.notes || '';
-
+      $('setoranItemsContainer').innerHTML = '';
+      addSetoranItemRow();
       $('setoranModal').classList.remove('hidden');
     }
 
+    $('addSetoranItemBtn').addEventListener('click', addSetoranItemRow);
     $('closeSetoranModalBtn').addEventListener('click', () => $('setoranModal').classList.add('hidden'));
     $('cancelSetoranBtn').addEventListener('click', () => $('setoranModal').classList.add('hidden'));
 
+    function validateAyatRange(ayatText, minA, maxA) {
+      const clean = ayatText.replace(/\s+/g, '');
+      const mSingle = clean.match(/^(\d+)$/);
+      if (mSingle) {
+        const n = Number(mSingle[1]);
+        return n >= minA && n <= maxA;
+      }
+      const mRange = clean.match(/^(\d+)-(\d+)$/);
+      if (mRange) {
+        const a = Number(mRange[1]), b = Number(mRange[2]);
+        return a >= minA && b <= maxA && a <= b;
+      }
+      return false;
+    }
+
     $('setoranForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const payload = {
-        eventId: state.activeEventId,
-        attendeeId: $('setoranAttIdInput').value,
-        surah: $('setoranSurah').value.trim(),
-        ayat: $('setoranAyat').value.trim(),
-        juz: $('setoranJuz').value.trim(),
-        jenisSetoran: $('setoranJenis').value,
-        nilai: $('setoranNilai').value,
-        notes: $('setoranNotes').value.trim()
-      };
-      const res = await apiPost('saveSetoran', payload);
-      if (res.success) {
-        toast(res.message, 'success');
-        $('setoranModal').classList.add('hidden');
-        await loadAllData();
-      } else {
-        toast(res.message, 'error');
-      }
-    });
+      const rows = Array.from($('setoranItemsContainer').children);
+      const items = [];
 
-    /* ==================== PEMINDAI QR (html5-qrcode) ==================== */
-    $('startScanBtn').addEventListener('click', async () => {
-      if (!state.activeEventId) {
-        toast('Pilih sesi halaqah sebelum menyalakan kamera.', 'error');
-        return;
+      for (let i = 0; i < rows.length; i++) {
+        const row = rows[i];
+        const idxVal = row.querySelector('.item-surah-select').value;
+        if (idxVal === '') {
+          toast(`Pilih Nama Surah pada baris ke-${i + 1}.`, 'error');
+          return;
+        }
+        const entry = QURAN_JUZ_ENTRIES[Number(idxVal)];
+        const ayatVal = row.querySelector('.item-ayat-input').value.trim();
+        if (!validateAyatRange(ayatVal, entry.min, entry.max)) {
+          toast(`Ayat pada ${entry.surah} (Juz ${entry.juz}) harus antara ${entry.min} sampai ${entry.max}.`, 'error');
+          return;
+        }
+        items.push({
+          surah: entry.surah,
+          ayat: ayatVal,
+          juz: String(entry.juz),
+          jenisSetoran: row.querySelector('.item-jenis-select').value,
+          kesalahanBaca: row.querySelector('.item-salah-input').value || '0',
+          notes: row.querySelector('.item-notes-input').value.trim()
+        });
       }
-      if (typeof Html5Qrcode === 'undefined') {
-        toast('Pustaka pemindai QR gagal dimuat. Periksa koneksi internet.', 'error');
-        return;
-      }
+
+      $('saveSetoranBtn').disabled = true;
+      $('saveSetoranBtn').textContent = 'Menyimpan...';
       try {
-        state.qrScanner = new Html5Qrcode('qr-reader');
-        await state.qrScanner.start(
-          { facingMode: 'environment' },
-          { fps: 10, qrbox: { width: 220, height: 220 } },
-          (decodedText) => {
-            const now = Date.now();
-            if (decodedText === state.lastScanCode && now - state.lastScanAt < 3000) return;
-            state.lastScanCode = decodedText;
-            state.lastScanAt = now;
-            performCheckIn(decodedText.trim());
-          },
-          () => {}
-        );
-        state.scanning = true;
-        $('startScanBtn').classList.add('hidden');
-        $('stopScanBtn').classList.remove('hidden');
-      } catch (err) {
-        toast('Gagal membuka kamera: ' + err, 'error');
+        const eventId = getPrimaryEventIdForDate(state.activeDate);
+        const res = await apiPost('saveSetoran', {
+          eventId,
+          date: state.activeDate,
+          attendeeId: $('setoranAttIdInput').value,
+          items
+        });
+        if (res.success) {
+          toast(res.message, 'success');
+          $('setoranModal').classList.add('hidden');
+          await loadAllData();
+        } else toast(res.message, 'error');
+      } finally {
+        $('saveSetoranBtn').disabled = false;
+        $('saveSetoranBtn').textContent = 'Simpan Setoran';
       }
     });
 
-    async function stopQrScanner() {
-      if (state.qrScanner && state.scanning) {
-        try { await state.qrScanner.stop(); } catch (_) {}
-        state.scanning = false;
-      }
-      $('startScanBtn').classList.remove('hidden');
-      $('stopScanBtn').classList.add('hidden');
-    }
-    $('stopScanBtn').addEventListener('click', stopQrScanner);
-
-    /* ==================== TAB JADWAL SESI ==================== */
-    function renderEventsTable() {
-      const tbody = $('eventsTableBody');
-      if (state.events.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--text-muted);">Belum ada jadwal sesi.</td></tr>';
-        return;
-      }
-      tbody.innerHTML = state.events.map((ev) => {
-        const count = state.logs.filter((l) => l.eventId === ev.eventId && ['Hadir', 'Terlambat', 'Present', 'Late'].includes(l.status)).length;
-        return `
-          <tr>
-            <td><strong>${escapeHtml(ev.eventName)}</strong><div style="font-size:0.74rem; color:var(--text-muted);">${escapeHtml(ev.eventId)}</div></td>
-            <td>${escapeHtml(ev.date)}</td>
-            <td>${escapeHtml(ev.startTime)}</td>
-            <td>${escapeHtml(ev.lateCutoffTime)}</td>
-            <td>${count} / ${state.attendees.length}</td>
-            <td>
-              <div style="display:flex; gap:6px;">
-                <button class="btn-outline btn-sm" onclick="editEvent('${escapeHtml(ev.eventId)}')">Edit</button>
-                <button class="btn-danger btn-sm" onclick="deleteEvent('${escapeHtml(ev.eventId)}')">Hapus</button>
-              </div>
-            </td>
-          </tr>
-        `;
-      }).join('');
-    }
-
-    $('eventForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const editId = $('editEventId').value;
-      const payload = {
-        eventId: editId || undefined,
-        eventName: $('evName').value.trim(),
-        date: $('evDate').value,
-        startTime: $('evStart').value,
-        lateCutoffTime: $('evCutoff').value
-      };
-      const res = await apiPost(editId ? 'updateEvent' : 'createEvent', { event: payload });
-      if (res.success) {
-        toast(res.message, 'success');
-        resetEventForm();
-        await loadAllData();
-      } else toast(res.message, 'error');
-    });
-
-    function editEvent(eventId) {
-      const ev = state.events.find((e) => e.eventId === eventId);
-      if (!ev) return;
-      $('editEventId').value = ev.eventId;
-      $('evName').value = ev.eventName;
-      $('evDate').value = ev.date;
-      $('evStart').value = ev.startTime;
-      $('evCutoff').value = ev.lateCutoffTime;
-      $('eventFormTitle').textContent = 'Edit Jadwal Sesi';
-      $('cancelEditEventBtn').classList.remove('hidden');
-    }
-
-    function resetEventForm() {
-      $('eventForm').reset();
-      $('editEventId').value = '';
-      $('eventFormTitle').textContent = 'Buat Jadwal Sesi Halaqah Baru';
-      $('cancelEditEventBtn').classList.add('hidden');
-    }
-    $('cancelEditEventBtn').addEventListener('click', resetEventForm);
-
-    async function deleteEvent(eventId) {
-      if (!confirm('Hapus jadwal sesi ini?')) return;
-      const res = await apiPost('deleteEvent', { eventId });
-      if (res.success) {
-        toast(res.message, 'success');
-        await loadAllData();
-      } else toast(res.message, 'error');
-    }
-
-    /* ==================== TAB DATA SANTRI & KARTU QR ==================== */
+    /* ==================== TAB 2: DATA SANTRI ==================== */
     let editingAttendeeId = '';
 
     function renderAttendeesTable() {
@@ -1673,18 +1224,18 @@
       );
       const tbody = $('attendeesTableBody');
       if (list.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:var(--text-muted);">Belum ada data santri.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--text-muted);">Belum ada data santri.</td></tr>';
         return;
       }
       tbody.innerHTML = list.map((a) => `
         <tr>
           <td><code>${escapeHtml(a.attendeeId)}</code></td>
           <td><strong>${escapeHtml(a.fullName)}</strong></td>
+          <td><code>${escapeHtml(a.fullName.trim().toLowerCase())}</code></td>
           <td>${escapeHtml(a.contact)}</td>
           <td><span class="badge badge-belum">${escapeHtml(a.groupType)}</span></td>
           <td>
-            <div style="display:flex; gap:6px; flex-wrap:wrap;">
-              <button class="btn-primary btn-sm" onclick="openQrModal('${escapeHtml(a.attendeeId)}')">Kartu QR</button>
+            <div style="display:flex; gap:6px;">
               <button class="btn-outline btn-sm" onclick="editAttendee('${escapeHtml(a.attendeeId)}')">Edit</button>
               <button class="btn-danger btn-sm" onclick="deleteAttendee('${escapeHtml(a.attendeeId)}')">Hapus</button>
             </div>
@@ -1700,7 +1251,7 @@
         attendeeId: editingAttendeeId || $('attId').value.trim(),
         fullName: $('attName').value.trim(),
         contact: $('attContact').value.trim(),
-        groupType: $('attGroup').value.trim() || 'Reguler'
+        groupType: $('attGroup').value.trim() || "HIMALATUL QUR'AN"
       };
       const res = await apiPost(editingAttendeeId ? 'updateAttendee' : 'createAttendee', { attendee: payload });
       if (res.success) {
@@ -1727,7 +1278,7 @@
       editingAttendeeId = '';
       $('attendeeForm').reset();
       $('attId').disabled = false;
-      $('attGroup').value = 'Reguler';
+      $('attGroup').value = "HIMALATUL QUR'AN";
       $('attendeeFormTitle').textContent = 'Tambah Santri';
       $('cancelEditAttendeeBtn').classList.add('hidden');
     }
@@ -1751,8 +1302,8 @@
     });
 
     $('downloadSampleCsvBtn').addEventListener('click', () => {
-      const sample = 'AttendeeID,FullName,Contact,GroupType\nSANTRI-201,Zaid Al-Harits,081234567890,Juz 30\n,Fatimah Az-Zahra,081987654321,Tahfidz\n';
-      downloadFile('contoh_santri.csv', sample, 'text/csv');
+      const sample = "AttendeeID,FullName,Contact,GroupType\nHQ-007,NAMA SANTRI,081234567890,HIMALATUL QUR'AN\n";
+      downloadFile('format_santri.csv', sample, 'text/csv');
     });
 
     $('importCsvBtn').addEventListener('click', async () => {
@@ -1763,18 +1314,14 @@
       lines.forEach((line, idx) => {
         const cols = line.split(',').map((c) => c.trim().replace(/^"|"$/g, ''));
         if (idx === 0 && /fullname|full name|nama/i.test(cols[1] || cols[0])) return;
-        if (cols.length === 1) {
-          parsed.push({ fullName: cols[0] });
-        } else {
-          parsed.push({
-            attendeeId: cols[0] || '',
-            fullName: cols[1] || cols[0],
-            contact: cols[2] || '',
-            groupType: cols[3] || 'Reguler'
-          });
-        }
+        parsed.push({
+          attendeeId: cols[0] || '',
+          fullName: cols[1] || cols[0],
+          contact: cols[2] || '',
+          groupType: cols[3] || "HIMALATUL QUR'AN"
+        });
       });
-      if (parsed.length === 0) { toast('Tidak ada baris valid yang ditemukan.', 'error'); return; }
+      if (parsed.length === 0) { toast('Tidak ada baris valid.', 'error'); return; }
       const res = await apiPost('bulkImportAttendees', { attendees: parsed });
       if (res.success) {
         toast(res.message, 'success');
@@ -1784,25 +1331,7 @@
       } else toast(res.message, 'error');
     });
 
-    function openQrModal(attendeeId) {
-      const att = state.attendees.find((a) => a.attendeeId === attendeeId);
-      if (!att) return;
-      $('badgeGroup').textContent = att.groupType || 'Reguler';
-      $('badgeName').textContent = att.fullName;
-      $('badgeId').textContent = att.attendeeId;
-      const container = $('qrBadgeCanvas');
-      container.innerHTML = '';
-      if (typeof QRCode !== 'undefined') {
-        new QRCode(container, { text: att.attendeeId, width: 180, height: 180 });
-      } else {
-        container.textContent = att.attendeeId;
-      }
-      $('qrModal').classList.remove('hidden');
-    }
-    $('closeQrModalBtn').addEventListener('click', () => $('qrModal').classList.add('hidden'));
-    $('closeQrModalBtn2').addEventListener('click', () => $('qrModal').classList.add('hidden'));
-
-    /* ==================== TAB LAPORAN BULANAN ==================== */
+    /* ==================== TAB 3: LAPORAN BULANAN ==================== */
     function getSelectedMonth() {
       if (!$('reportMonthInput').value) {
         $('reportMonthInput').value = new Date().toISOString().slice(0, 7);
@@ -1817,42 +1346,38 @@
 
       const totalEvents = monthEvents.length;
       const totalSlots = totalEvents * state.attendees.length;
-
-      let totalPresent = 0, totalLate = 0, totalExcused = 0, totalNoShow = 0, totalSetoran = 0;
+      let totalPresent = 0, totalExcused = 0, totalNoShow = 0, totalSetoran = 0;
 
       const perAttendee = state.attendees.map((att) => {
-        let present = 0, late = 0, excused = 0, noShow = 0, setoranCount = 0;
+        let present = 0, excused = 0, noShow = 0, setoranCount = 0;
         let lastSetoran = '-';
 
         monthEvents.forEach((ev) => {
-          const log = monthLogs.find((l) => l.eventId === ev.eventId && l.attendeeId.toLowerCase() === att.attendeeId.toLowerCase());
-          const st = log ? normalizeStatus(log.status) : 'Alpha';
+          const evLogs = monthLogs.filter((l) => l.eventId === ev.eventId && l.attendeeId.toLowerCase() === att.attendeeId.toLowerCase());
+          const st = evLogs.length > 0 ? normalizeStatus(evLogs[0].status) : 'Alpha';
           if (st === 'Hadir') present++;
-          else if (st === 'Terlambat') late++;
           else if (st === 'Izin') excused++;
           else noShow++;
 
-          if (log && log.surah) {
-            setoranCount++;
-            if (lastSetoran === '-') {
-              lastSetoran = `${log.surah}${log.ayat ? ' : ' + log.ayat : ''} (${log.nilai || '-'})`;
+          evLogs.forEach((l) => {
+            if (l.surah) {
+              setoranCount++;
+              lastSetoran = `${l.surah}${l.ayat ? ' (' + l.ayat + ')' : ''} · Juz ${l.juz || '-'}`;
             }
-          }
+          });
         });
 
         totalPresent += present;
-        totalLate += late;
         totalExcused += excused;
         totalNoShow += noShow;
         totalSetoran += setoranCount;
 
-        const attended = present + late;
-        const rate = totalEvents > 0 ? Math.round((attended / totalEvents) * 100) : 0;
-        return { ...att, totalEvents, present, late, excused, noShow, rate, setoranCount, lastSetoran };
+        const rate = totalEvents > 0 ? Math.round((present / totalEvents) * 100) : 0;
+        return { ...att, totalEvents, present, excused, noShow, rate, setoranCount, lastSetoran };
       });
 
-      const onTimeRate = totalSlots > 0 ? Math.round((totalPresent / totalSlots) * 100) : 0;
-      return { monthEvents, monthLogs, totalEvents, totalSlots, totalPresent, totalLate, totalExcused, totalNoShow, totalSetoran, onTimeRate, perAttendee };
+      const attendRate = totalSlots > 0 ? Math.round((totalPresent / totalSlots) * 100) : 0;
+      return { monthEvents, monthLogs, totalEvents, totalSlots, totalPresent, totalExcused, totalNoShow, totalSetoran, attendRate, perAttendee };
     }
 
     function renderReports() {
@@ -1860,13 +1385,13 @@
       const rep = computeMonthlyReport(month);
 
       $('repEventsCount').textContent = rep.totalEvents;
-      $('repOnTimeRate').textContent = rep.onTimeRate + '%';
-      $('repLateNoShow').textContent = `${rep.totalLate} / ${rep.totalNoShow}`;
+      $('repAttendRate').textContent = rep.attendRate + '%';
+      $('repIzinAlpha').textContent = `${rep.totalExcused} / ${rep.totalNoShow}`;
       $('repTotalSetoran').textContent = rep.totalSetoran;
 
       const tbody = $('reportAttendeeBody');
       if (rep.perAttendee.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; color:var(--text-muted);">Belum ada data santri untuk dilaporkan.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; color:var(--text-muted);">Belum ada data santri.</td></tr>';
         return;
       }
       tbody.innerHTML = rep.perAttendee.map((r) => `
@@ -1875,7 +1400,6 @@
           <td>${escapeHtml(r.groupType)}</td>
           <td>${r.totalEvents}</td>
           <td style="color:var(--success); font-weight:700;">${r.present}</td>
-          <td style="color:var(--warning); font-weight:700;">${r.late}</td>
           <td style="color:var(--info); font-weight:700;">${r.excused}</td>
           <td style="color:var(--danger); font-weight:700;">${r.noShow}</td>
           <td><strong>${r.rate}%</strong></td>
@@ -1900,27 +1424,25 @@
       const rep = computeMonthlyReport(month);
       const rows = [
         ['Bulan Laporan', month],
-        ['Jumlah Sesi', rep.totalEvents],
-        ['Tingkat Tepat Waktu', rep.onTimeRate + '%'],
-        ['Terlambat', rep.totalLate],
-        ['Alpha / Tidak Hadir', rep.totalNoShow],
+        ['Hari Pertemuan', rep.totalEvents],
+        ['Tingkat Kehadiran', rep.attendRate + '%'],
         ['Total Setoran Hafalan', rep.totalSetoran],
         [],
-        ['ID Santri', 'Nama Lengkap', 'Halaqah', 'Total Sesi', 'Hadir', 'Terlambat', 'Izin', 'Alpha', 'Persentase Kehadiran', 'Jumlah Setoran', 'Setoran Terakhir']
+        ['ID Santri', 'Nama Lengkap', 'Halaqah', 'Pertemuan', 'Hadir', 'Izin', 'Alpha', 'Kehadiran', 'Jumlah Setoran', 'Setoran Terakhir']
       ];
       rep.perAttendee.forEach((r) => {
         rows.push([
           r.attendeeId, `"${r.fullName}"`, `"${r.groupType}"`,
-          r.totalEvents, r.present, r.late, r.excused, r.noShow,
+          r.totalEvents, r.present, r.excused, r.noShow,
           r.rate + '%', r.setoranCount, `"${r.lastSetoran}"`
         ]);
       });
-      rows.push([], ['--- DETAIL LOG SETORAN HAFALAN ---'], ['ID Sesi', 'ID Santri', 'Nama Santri', 'Status', 'Surah', 'Ayat', 'Juz', 'Jenis', 'Nilai', 'Catatan']);
+      rows.push([], ['--- DETAIL LOG SETORAN HAFALAN ---'], ['ID Sesi', 'ID Santri', 'Nama Santri', 'Status', 'Surah', 'Ayat', 'Juz', 'Jenis', 'Kesalahan Baca', 'Catatan']);
       rep.monthLogs.forEach((l) => {
         rows.push([
           l.eventId, l.attendeeId, `"${l.fullName}"`, normalizeStatus(l.status),
           `"${l.surah || ''}"`, `"${l.ayat || ''}"`, l.juz || '',
-          `"${l.jenisSetoran || ''}"`, `"${l.nilai || ''}"`, `"${l.notes || ''}"`
+          `"${l.jenisSetoran || ''}"`, l.kesalahanBaca || '0', `"${l.notes || ''}"`
         ]);
       });
       const csv = rows.map((r) => r.join(',')).join('\n');
@@ -1935,43 +1457,37 @@
       toast('Data berhasil disinkronkan.', 'success');
     });
 
-    $('openSettingsBtn').addEventListener('click', () => {
-      $('settingsApiUrl').value = state.apiUrl;
-      $('settingsModal').classList.remove('hidden');
-    });
+    $('openSettingsBtn').addEventListener('click', () => $('settingsModal').classList.remove('hidden'));
     $('closeSettingsBtn').addEventListener('click', () => $('settingsModal').classList.add('hidden'));
-
-    $('saveApiUrlBtn').addEventListener('click', async () => {
-      state.apiUrl = $('settingsApiUrl').value.trim();
-      state.isDemo = !state.apiUrl;
-      localStorage.setItem(STORAGE_KEYS.API_URL, state.apiUrl);
-      $('demoBanner').classList.toggle('hidden', !state.isDemo);
-      $('settingsModal').classList.add('hidden');
-      await loadAllData();
-      toast('Pengaturan disimpan.', 'success');
-    });
 
     $('updatePinBtn').addEventListener('click', async () => {
       const newPin = $('newPinInput').value.trim();
-      if (newPin.length < 4) { toast('PIN minimal 4 karakter.', 'error'); return; }
+      if (newPin.length < 4) { toast('Password minimal 4 karakter.', 'error'); return; }
       const res = await apiPost('updatePin', { newPin });
       if (res.success) {
         state.pin = newPin;
         sessionStorage.setItem(STORAGE_KEYS.PIN, newPin);
         $('newPinInput').value = '';
-        toast('PIN Admin berhasil diperbarui!', 'success');
+        $('settingsModal').classList.add('hidden');
+        toast('Password Admin berhasil diperbarui!', 'success');
       } else toast(res.message, 'error');
     });
 
     /* ==================== INISIALISASI ==================== */
     (async function init() {
-      $('apiUrlInput').value = state.apiUrl;
-      $('evDate').value = new Date().toISOString().slice(0, 10);
+      $('activeDateInput').value = state.activeDate;
       $('reportMonthInput').value = new Date().toISOString().slice(0, 7);
 
       if (state.pin) {
         try {
-          await attemptLogin(state.apiUrl, state.pin);
+          const res = await apiGet('verifyPin', { pin: state.pin });
+          if (res.success) {
+            $('authScreen').classList.add('hidden');
+            $('appShell').classList.remove('hidden');
+            await loadAllData();
+          } else {
+            sessionStorage.removeItem(STORAGE_KEYS.PIN);
+          }
         } catch (_) {
           sessionStorage.removeItem(STORAGE_KEYS.PIN);
         }
