@@ -462,49 +462,36 @@
 
       <!-- ==================== TAB 2: DATA SANTRI ==================== -->
       <section id="tab-attendees" class="tab-panel hidden" style="display:flex; flex-direction:column; gap:16px;">
-        <div class="grid-2">
-          <div class="card">
-            <div class="card-title">
-              <span id="attendeeFormTitle">Tambah Santri</span>
-              <button class="btn-outline btn-sm hidden" id="cancelEditAttendeeBtn">Batal Edit</button>
-            </div>
-            <form id="attendeeForm" class="grid-2" style="gap:10px;">
-              <div>
-                <label for="attId">ID Santri (opsional)</label>
-                <input id="attId" type="text" />
-              </div>
-              <div>
-                <label for="attName">Nama Lengkap *</label>
-                <input id="attName" type="text" required />
-              </div>
-              <div>
-                <label for="attContact">No. WA / Kontak</label>
-                <input id="attContact" type="text" />
-              </div>
-              <div>
-                <label for="attGroup">Kelompok / Halaqah</label>
-                <input id="attGroup" type="text" value="HIMALATUL QUR'AN" />
-              </div>
-              <div style="grid-column: 1 / -1; display:flex; justify-content:flex-end;">
-                <button type="submit" class="btn-primary" id="saveAttendeeBtn">Simpan Santri</button>
-              </div>
-            </form>
+        <div class="card">
+          <div class="card-title">
+            <span id="attendeeFormTitle">Tambah Santri</span>
+            <button class="btn-outline btn-sm hidden" id="cancelEditAttendeeBtn">Batal Edit</button>
           </div>
-
-          <div class="card">
-            <div class="card-title">
-              <span>Impor Santri Massal (CSV)</span>
-              <button class="btn-outline btn-sm" id="downloadSampleCsvBtn">Unduh Format CSV</button>
+          <form id="attendeeForm" class="grid-3" style="gap:10px;">
+            <div>
+              <label for="attId">ID Santri</label>
+              <input id="attId" type="text" />
             </div>
-            <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:8px;">
-              Format kolom: <code>AttendeeID,FullName,Contact,GroupType</code>
-            </p>
-            <input type="file" id="csvFileInput" accept=".csv,text/csv" style="margin-bottom:8px;" />
-            <textarea id="csvPasteArea" rows="3"></textarea>
-            <div style="display:flex; justify-content:flex-end; margin-top:8px;">
-              <button class="btn-primary btn-sm" id="importCsvBtn">Impor Data Santri</button>
+            <div>
+              <label for="attName">Nama Lengkap *</label>
+              <input id="attName" type="text" required />
             </div>
-          </div>
+            <div>
+              <label for="attUsername">Username</label>
+              <input id="attUsername" type="text" />
+            </div>
+            <div>
+              <label for="attPassword">Password</label>
+              <input id="attPassword" type="text" />
+            </div>
+            <div>
+              <label for="attContact">Kontak</label>
+              <input id="attContact" type="text" />
+            </div>
+            <div style="display:flex; align-items:flex-end; justify-content:flex-end;">
+              <button type="submit" class="btn-primary" id="saveAttendeeBtn" style="width:100%;">Simpan Santri</button>
+            </div>
+          </form>
         </div>
 
         <div class="card">
@@ -518,9 +505,9 @@
                 <tr>
                   <th>ID Santri</th>
                   <th>Nama Lengkap</th>
-                  <th>Username Login</th>
+                  <th>Username</th>
+                  <th>Password</th>
                   <th>Kontak</th>
-                  <th>Halaqah</th>
                   <th>Aksi</th>
                 </tr>
               </thead>
@@ -572,28 +559,49 @@
     </main>
   </div>
 
-  <!-- ==================== MODAL CATAT SETORAN MULTI-SURAH ==================== -->
+  <!-- ==================== MODAL CATAT SETORAN (DETAIL & RINGKAS) ==================== -->
   <div id="setoranModal" class="modal-backdrop hidden">
     <div class="modal">
       <div class="card-title">
         <span>Catat Setoran Hafalan Al-Qur'an</span>
         <button class="btn-outline btn-sm" id="closeSetoranModalBtn">✕</button>
       </div>
-      <p style="font-size:0.86rem; color:var(--text-muted); margin-bottom:14px;">
+      <p style="font-size:0.86rem; color:var(--text-muted); margin-bottom:12px;">
         Santri: <strong id="setoranSantriName" style="color:var(--text);"></strong> (<code id="setoranSantriId"></code>)
       </p>
 
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; background:var(--surface-alt); padding:4px; border-radius:10px; margin-bottom:14px;">
+        <button type="button" class="nav-tab active" id="setoranTabDetailBtn" style="text-align:center;">Per Surah</button>
+        <button type="button" class="nav-tab" id="setoranTabRingkasBtn" style="text-align:center;">Per Juz</button>
+      </div>
+
+      <input type="hidden" id="setoranAttIdInput" />
+
+      <!-- Tab 1: Per Surah -->
       <form id="setoranForm" style="display:flex; flex-direction:column; gap:12px;">
-        <input type="hidden" id="setoranAttIdInput" />
         <div id="setoranItemsContainer" style="display:flex; flex-direction:column; gap:12px;"></div>
 
         <div>
-          <button type="button" class="btn-outline btn-sm" id="addSetoranItemBtn">+ Tambah Surah / Juz Lain</button>
+          <button type="button" class="btn-outline btn-sm" id="addSetoranItemBtn">+ Tambah Surah</button>
         </div>
 
         <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:6px;">
           <button type="button" class="btn-outline" id="cancelSetoranBtn">Batal</button>
           <button type="submit" class="btn-primary" id="saveSetoranBtn">Simpan Setoran</button>
+        </div>
+      </form>
+
+      <!-- Tab 2: Per Juz (Multi-Juz Lengkap) -->
+      <form id="setoranRingkasForm" class="hidden" style="display:flex; flex-direction:column; gap:12px;">
+        <div id="ringkasItemsContainer" style="display:flex; flex-direction:column; gap:12px;"></div>
+
+        <div>
+          <button type="button" class="btn-outline btn-sm" id="addRingkasItemBtn">+ Tambah Juz</button>
+        </div>
+
+        <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:6px;">
+          <button type="button" class="btn-outline" id="cancelRingkasBtn">Batal</button>
+          <button type="submit" class="btn-primary" id="saveRingkasBtn">Simpan Hafalan Per Juz</button>
         </div>
       </form>
     </div>
@@ -619,7 +627,7 @@
   <div id="toastContainer"></div>
 
   <script>
-    const FIXED_API_URL = 'https://script.google.com/macros/s/AKfycbwZOuHap1xHGW5XauDcy5vAyjgvZ53YuzsChBIzdGQjc68Px7lirKPTjHuGpSbxhqCo/exec';
+    const FIXED_API_URL = 'https://script.google.com/macros/s/AKfycbyYwuvQ1iEnZav8T-klmb2yb25aDEjLFzxUEb1gHxOFzqJvUE1cj_qQ_kfraX_Ap03y/exec';
 
     const QURAN_JUZ_ENTRIES = [
       { no: 1, surah: "Al-Fatihah", min: 1, max: 7, juz: 1 },
@@ -1135,6 +1143,63 @@
       container.appendChild(rowDiv);
     }
 
+    function addRingkasItemRow() {
+      const container = $('ringkasItemsContainer');
+      const rowDiv = document.createElement('div');
+      rowDiv.className = 'setoran-item-box';
+      rowDiv.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong style="font-size:0.84rem; color:var(--primary);">Setoran Per Juz</strong>
+          <button type="button" class="btn-danger btn-sm remove-ringkas-btn">Hapus</button>
+        </div>
+        <div class="grid-3" style="gap:10px;">
+          <div>
+            <label>Nomor Juz (1–30) *</label>
+            <input type="number" class="ringkas-juz-input" min="1" max="30" required />
+          </div>
+          <div>
+            <label>Jenis Setoran</label>
+            <select class="ringkas-jenis-select">
+              <option value="Ziyadah">Ziyadah</option>
+              <option value="Murojaah">Murojaah</option>
+              <option value="Tasmi'">Tasmi'</option>
+              <option value="Ikhtibar">Ikhtibar</option>
+            </select>
+          </div>
+          <div>
+            <label>Kesalahan Baca</label>
+            <input type="number" class="ringkas-salah-input" min="0" value="0" required />
+          </div>
+        </div>
+        <div class="ringkas-preview-box" style="background:#fff; border:1px solid var(--border); border-radius:8px; padding:8px; font-size:0.78rem; color:var(--text-muted);">
+          Masukkan nomor Juz (1–30) untuk melihat cakupan surah &amp; ayat.
+        </div>
+        <div>
+          <label>Catatan Pembimbing</label>
+          <input type="text" class="ringkas-notes-input" />
+        </div>
+      `;
+
+      const juzInput = rowDiv.querySelector('.ringkas-juz-input');
+      const previewBox = rowDiv.querySelector('.ringkas-preview-box');
+      juzInput.addEventListener('input', () => {
+        const juzNum = Number(juzInput.value);
+        const summary = getJuzSurahSummary(juzNum);
+        if (!summary) {
+          previewBox.textContent = 'Masukkan nomor Juz antara 1 sampai 30.';
+          return;
+        }
+        previewBox.innerHTML = `<strong>Cakupan Juz ${juzNum} (${summary.entries.length} bagian surah):</strong><br/>${escapeHtml(summary.listText)}`;
+      });
+
+      rowDiv.querySelector('.remove-ringkas-btn').addEventListener('click', () => {
+        if (container.children.length > 1) rowDiv.remove();
+        else toast('Minimal harus ada 1 baris Juz.', 'error');
+      });
+
+      container.appendChild(rowDiv);
+    }
+
     function openSetoranModal(attendeeId) {
       const att = state.attendees.find((a) => a.attendeeId === attendeeId);
       if (!att) return;
@@ -1143,8 +1208,80 @@
       $('setoranSantriId').textContent = att.attendeeId;
       $('setoranItemsContainer').innerHTML = '';
       addSetoranItemRow();
+      $('ringkasItemsContainer').innerHTML = '';
+      addRingkasItemRow();
+      $('setoranTabDetailBtn').click();
       $('setoranModal').classList.remove('hidden');
     }
+
+    $('addRingkasItemBtn').addEventListener('click', addRingkasItemRow);
+
+    $('setoranTabDetailBtn').addEventListener('click', () => {
+      $('setoranTabDetailBtn').classList.add('active');
+      $('setoranTabRingkasBtn').classList.remove('active');
+      $('setoranForm').classList.remove('hidden');
+      $('setoranRingkasForm').classList.add('hidden');
+    });
+
+    $('setoranTabRingkasBtn').addEventListener('click', () => {
+      $('setoranTabRingkasBtn').classList.add('active');
+      $('setoranTabDetailBtn').classList.remove('active');
+      $('setoranRingkasForm').classList.remove('hidden');
+      $('setoranForm').classList.add('hidden');
+    });
+
+    function getJuzSurahSummary(juzNum) {
+      const entries = QURAN_JUZ_ENTRIES.filter((e) => e.juz === juzNum);
+      if (entries.length === 0) return null;
+      const listText = entries.map((e) => `${e.surah} (${e.min}–${e.max})`).join(', ');
+      return { entries, listText };
+    }
+
+    $('cancelRingkasBtn').addEventListener('click', () => $('setoranModal').classList.add('hidden'));
+
+    $('setoranRingkasForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const rows = Array.from($('ringkasItemsContainer').children);
+      const items = [];
+
+      for (let i = 0; i < rows.length; i++) {
+        const row = rows[i];
+        const juzNum = Number(row.querySelector('.ringkas-juz-input').value);
+        const summary = getJuzSurahSummary(juzNum);
+        if (!summary) {
+          toast(`Nomor Juz pada baris ke-${i + 1} harus antara 1 sampai 30.`, 'error');
+          return;
+        }
+        items.push({
+          surah: `Juz ${juzNum} Lengkap: ${summary.listText}`,
+          ayat: `Lengkap Juz ${juzNum}`,
+          juz: String(juzNum),
+          jenisSetoran: row.querySelector('.ringkas-jenis-select').value,
+          kesalahanBaca: row.querySelector('.ringkas-salah-input').value || '0',
+          notes: row.querySelector('.ringkas-notes-input').value.trim()
+        });
+      }
+
+      $('saveRingkasBtn').disabled = true;
+      $('saveRingkasBtn').textContent = 'Menyimpan...';
+      try {
+        const eventId = getPrimaryEventIdForDate(state.activeDate);
+        const res = await apiPost('saveSetoran', {
+          eventId,
+          date: state.activeDate,
+          attendeeId: $('setoranAttIdInput').value,
+          items
+        });
+        if (res.success) {
+          toast(res.message, 'success');
+          $('setoranModal').classList.add('hidden');
+          await loadAllData();
+        } else toast(res.message, 'error');
+      } finally {
+        $('saveRingkasBtn').disabled = false;
+        $('saveRingkasBtn').textContent = 'Simpan Hafalan Per Juz';
+      }
+    });
 
     $('addSetoranItemBtn').addEventListener('click', addSetoranItemRow);
     $('closeSetoranModalBtn').addEventListener('click', () => $('setoranModal').classList.add('hidden'));
@@ -1217,41 +1354,56 @@
     /* ==================== TAB 2: DATA SANTRI ==================== */
     let editingAttendeeId = '';
 
+    function toTitleCase(str) {
+      return String(str || '').trim().toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
+    }
+
     function renderAttendeesTable() {
       const q = $('attendeeSearchInput').value.trim().toLowerCase();
       const list = state.attendees.filter((a) =>
-        !q || [a.attendeeId, a.fullName, a.contact, a.groupType].some((v) => String(v).toLowerCase().includes(q))
+        !q || [a.attendeeId, a.fullName, a.username, a.contact].some((v) => String(v).toLowerCase().includes(q))
       );
       const tbody = $('attendeesTableBody');
       if (list.length === 0) {
         tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--text-muted);">Belum ada data santri.</td></tr>';
         return;
       }
-      tbody.innerHTML = list.map((a) => `
-        <tr>
-          <td><code>${escapeHtml(a.attendeeId)}</code></td>
-          <td><strong>${escapeHtml(a.fullName)}</strong></td>
-          <td><code>${escapeHtml(a.fullName.trim().toLowerCase())}</code></td>
-          <td>${escapeHtml(a.contact)}</td>
-          <td><span class="badge badge-belum">${escapeHtml(a.groupType)}</span></td>
-          <td>
-            <div style="display:flex; gap:6px;">
-              <button class="btn-outline btn-sm" onclick="editAttendee('${escapeHtml(a.attendeeId)}')">Edit</button>
-              <button class="btn-danger btn-sm" onclick="deleteAttendee('${escapeHtml(a.attendeeId)}')">Hapus</button>
-            </div>
-          </td>
-        </tr>
-      `).join('');
+      tbody.innerHTML = list.map((a) => {
+        const namaCap = toTitleCase(a.fullName);
+        const uname = a.username || a.fullName.trim().toLowerCase();
+        const pwd = a.password || (uname.split(/\s+/)[0] + '1234');
+        return `
+          <tr>
+            <td><code>${escapeHtml(a.attendeeId)}</code></td>
+            <td><strong>${escapeHtml(namaCap)}</strong></td>
+            <td><code>${escapeHtml(uname)}</code></td>
+            <td><code>${escapeHtml(pwd)}</code></td>
+            <td>${escapeHtml(a.contact || '-')}</td>
+            <td>
+              <div style="display:flex; gap:6px;">
+                <button class="btn-outline btn-sm" onclick="editAttendee('${escapeHtml(a.attendeeId)}')">Edit</button>
+                <button class="btn-danger btn-sm" onclick="deleteAttendee('${escapeHtml(a.attendeeId)}')">Hapus</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
     }
     $('attendeeSearchInput').addEventListener('input', renderAttendeesTable);
 
     $('attendeeForm').addEventListener('submit', async (e) => {
       e.preventDefault();
+      const fullName = toTitleCase($('attName').value);
+      const uname = $('attUsername').value.trim().toLowerCase() || fullName.toLowerCase();
+      const pwd = $('attPassword').value.trim() || (uname.split(/\s+/)[0] + '1234');
       const payload = {
-        attendeeId: editingAttendeeId || $('attId').value.trim(),
-        fullName: $('attName').value.trim(),
+        originalAttendeeId: editingAttendeeId || undefined,
+        attendeeId: $('attId').value.trim(),
+        fullName,
+        username: uname,
+        password: pwd,
         contact: $('attContact').value.trim(),
-        groupType: $('attGroup').value.trim() || "HIMALATUL QUR'AN"
+        groupType: "HIMALATUL QUR'AN"
       };
       const res = await apiPost(editingAttendeeId ? 'updateAttendee' : 'createAttendee', { attendee: payload });
       if (res.success) {
@@ -1264,21 +1416,22 @@
     function editAttendee(id) {
       const a = state.attendees.find((x) => x.attendeeId === id);
       if (!a) return;
+      const uname = a.username || a.fullName.trim().toLowerCase();
+      const pwd = a.password || (uname.split(/\s+/)[0] + '1234');
       editingAttendeeId = a.attendeeId;
       $('attId').value = a.attendeeId;
-      $('attId').disabled = true;
-      $('attName').value = a.fullName;
-      $('attContact').value = a.contact;
-      $('attGroup').value = a.groupType;
+      $('attName').value = toTitleCase(a.fullName);
+      $('attUsername').value = uname;
+      $('attPassword').value = pwd;
+      $('attContact').value = a.contact || '';
       $('attendeeFormTitle').textContent = 'Edit Data Santri';
       $('cancelEditAttendeeBtn').classList.remove('hidden');
+      $('attName').focus();
     }
 
     function resetAttendeeForm() {
       editingAttendeeId = '';
       $('attendeeForm').reset();
-      $('attId').disabled = false;
-      $('attGroup').value = "HIMALATUL QUR'AN";
       $('attendeeFormTitle').textContent = 'Tambah Santri';
       $('cancelEditAttendeeBtn').classList.add('hidden');
     }
@@ -1292,44 +1445,6 @@
         await loadAllData();
       } else toast(res.message, 'error');
     }
-
-    $('csvFileInput').addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = (ev) => { $('csvPasteArea').value = ev.target.result; };
-      reader.readAsText(file);
-    });
-
-    $('downloadSampleCsvBtn').addEventListener('click', () => {
-      const sample = "AttendeeID,FullName,Contact,GroupType\nHQ-007,NAMA SANTRI,081234567890,HIMALATUL QUR'AN\n";
-      downloadFile('format_santri.csv', sample, 'text/csv');
-    });
-
-    $('importCsvBtn').addEventListener('click', async () => {
-      const text = $('csvPasteArea').value.trim();
-      if (!text) { toast('Tempel atau unggah file CSV terlebih dahulu.', 'error'); return; }
-      const lines = text.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
-      const parsed = [];
-      lines.forEach((line, idx) => {
-        const cols = line.split(',').map((c) => c.trim().replace(/^"|"$/g, ''));
-        if (idx === 0 && /fullname|full name|nama/i.test(cols[1] || cols[0])) return;
-        parsed.push({
-          attendeeId: cols[0] || '',
-          fullName: cols[1] || cols[0],
-          contact: cols[2] || '',
-          groupType: cols[3] || "HIMALATUL QUR'AN"
-        });
-      });
-      if (parsed.length === 0) { toast('Tidak ada baris valid.', 'error'); return; }
-      const res = await apiPost('bulkImportAttendees', { attendees: parsed });
-      if (res.success) {
-        toast(res.message, 'success');
-        $('csvPasteArea').value = '';
-        $('csvFileInput').value = '';
-        await loadAllData();
-      } else toast(res.message, 'error');
-    });
 
     /* ==================== TAB 3: LAPORAN BULANAN ==================== */
     function getSelectedMonth() {
