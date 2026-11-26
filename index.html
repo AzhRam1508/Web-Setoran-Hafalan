@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Absensi &amp; Setoran Hafalan — Himalatul Qur'an</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
   <style>
     :root {
       --bg: #f8fafc;
@@ -353,7 +356,10 @@
             <div id="studentHeaderMeta" style="font-size:0.74rem; font-weight:500; color:var(--text-muted);">HIMALATUL QUR'AN</div>
           </div>
         </div>
-        <button class="btn-danger btn-sm" id="studentLogoutBtn">Keluar</button>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <button class="btn-outline btn-sm hidden" id="backToAdminBtn">← Kembali ke Laporan</button>
+          <button class="btn-danger btn-sm" id="studentLogoutBtn">Keluar</button>
+        </div>
       </div>
     </header>
 
@@ -519,12 +525,25 @@
 
       <!-- ==================== TAB 3: LAPORAN BULANAN ==================== -->
       <section id="tab-reports" class="tab-panel hidden" style="display:flex; flex-direction:column; gap:16px;">
-        <div class="card" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
-          <div>
-            <label for="reportMonthInput">Pilih Bulan Laporan</label>
-            <input id="reportMonthInput" type="month" style="width:auto;" />
+        <div class="card" style="display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+          <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end;">
+            <div>
+              <label for="reportMonthInput">Tampilan Bulan</label>
+              <input id="reportMonthInput" type="month" style="width:auto;" />
+            </div>
+            <div>
+              <label for="exportStartDate">Unduh Dari Tanggal</label>
+              <input id="exportStartDate" type="date" style="width:auto;" />
+            </div>
+            <div>
+              <label for="exportEndDate">Sampai Tanggal</label>
+              <input id="exportEndDate" type="date" style="width:auto;" />
+            </div>
           </div>
-          <button class="btn-primary" id="exportCsvBtn">⬇ Ekspor Laporan CSV</button>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button class="btn-success" id="exportXlsxBtn">⬇ Unduh Excel (.xlsx)</button>
+            <button class="btn-primary" id="exportPdfBtn">⬇ Unduh PDF</button>
+          </div>
         </div>
 
         <div class="grid-4">
@@ -549,6 +568,7 @@
                   <th>Kehadiran</th>
                   <th>Jumlah Setoran</th>
                   <th>Setoran Terakhir</th>
+                  <th>Aksi</th>
                 </tr>
               </thead>
               <tbody id="reportAttendeeBody"></tbody>
@@ -877,12 +897,13 @@
     });
 
     /* ==================== DASBOR SANTRI (READ-ONLY) ==================== */
-    function renderStudentDashboard() {
+    function renderStudentDashboard(overrideLogs) {
       if (!state.currentStudent) return;
       const monthFilter = $('studentMonthFilter').value;
       const evMap = new Map(state.events.map((e) => [e.eventId, e]));
+      const sourceLogs = overrideLogs || state.studentLogs || state.logs;
 
-      const myLogs = state.logs.filter((l) => {
+      const myLogs = sourceLogs.filter((l) => {
         if (!monthFilter) return true;
         const ev = evMap.get(l.eventId);
         const dt = ev ? ev.date : (l.checkInTimestamp || '').slice(0, 10);
@@ -1233,8 +1254,24 @@
     function getJuzSurahSummary(juzNum) {
       const entries = QURAN_JUZ_ENTRIES.filter((e) => e.juz === juzNum);
       if (entries.length === 0) return null;
-      const listText = entries.map((e) => `${e.surah} (${e.min}–${e.max})`).join(', ');
-      return { entries, listText };
+
+      // Hitung format standar nomor surah: contoh "78-114" atau "76-78:14" atau "2:142-252"
+      const first = entries[0];
+      const last = entries[entries.length - 1];
+      const firstFullMax = Math.max(...QURAN_JUZ_ENTRIES.filter((e) => e.no === first.no).map((e) => e.max));
+      const lastFullMax = Math.max(...QURAN_JUZ_ENTRIES.filter((e) => e.no === last.no).map((e) => e.max));
+
+      const startPart = first.min > 1 ? `${first.no}:${first.min}` : `${first.no}`;
+      const endPart = last.max < lastFullMax ? `${last.no}:${last.max}` : `${last.no}`;
+      let codeText = '';
+      if (entries.length === 1) {
+        codeText = (first.min > 1 || last.max < firstFullMax) ? `${first.no}:${first.min}-${last.max}` : `${first.no}`;
+      } else {
+        codeText = `${startPart}-${endPart}`;
+      }
+
+      const listText = entries.map((e) => `${e.no}. ${e.surah} (${e.min}–${e.max})`).join(', ');
+      return { entries, listText, codeText };
     }
 
     $('cancelRingkasBtn').addEventListener('click', () => $('setoranModal').classList.add('hidden'));
@@ -1253,8 +1290,8 @@
           return;
         }
         items.push({
-          surah: `Juz ${juzNum} Lengkap: ${summary.listText}`,
-          ayat: `Lengkap Juz ${juzNum}`,
+          surah: summary.codeText,
+          ayat: '-',
           juz: String(juzNum),
           jenisSetoran: row.querySelector('.ringkas-jenis-select').value,
           kesalahanBaca: row.querySelector('.ringkas-salah-input').value || '0',
@@ -1506,7 +1543,7 @@
 
       const tbody = $('reportAttendeeBody');
       if (rep.perAttendee.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; color:var(--text-muted);">Belum ada data santri.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; color:var(--text-muted);">Belum ada data santri.</td></tr>';
         return;
       }
       tbody.innerHTML = rep.perAttendee.map((r) => `
@@ -1520,49 +1557,327 @@
           <td><strong>${r.rate}%</strong></td>
           <td style="color:var(--primary); font-weight:700;">${r.setoranCount}x</td>
           <td style="font-size:0.78rem;">${escapeHtml(r.lastSetoran)}</td>
+          <td>
+            <button class="btn-primary btn-sm" onclick="openStudentPersonalReport('${escapeHtml(r.attendeeId)}')">Rekap Personal</button>
+          </td>
         </tr>
       `).join('');
     }
-    $('reportMonthInput').addEventListener('change', renderReports);
 
-    function downloadFile(filename, content, mime) {
-      const blob = new Blob([content], { type: mime });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = filename;
-      a.click();
-      URL.revokeObjectURL(a.href);
+    function openStudentPersonalReport(attendeeId) {
+      const att = state.attendees.find((a) => a.attendeeId === attendeeId);
+      if (!att) return;
+      state.currentStudent = att;
+      state.studentLogs = state.logs.filter((l) => l.attendeeId.toLowerCase() === att.attendeeId.toLowerCase());
+      $('appShell').classList.add('hidden');
+      $('studentShell').classList.remove('hidden');
+      $('backToAdminBtn').classList.remove('hidden');
+      $('studentLogoutBtn').classList.add('hidden');
+      $('studentHeaderName').textContent = toTitleCase(att.fullName);
+      $('studentHeaderMeta').textContent = `${att.attendeeId} · ${att.groupType || "HIMALATUL QUR'AN"}`;
+      $('studentMonthFilter').value = '';
+      renderStudentDashboard(state.studentLogs);
     }
 
-    $('exportCsvBtn').addEventListener('click', () => {
-      const month = getSelectedMonth();
-      const rep = computeMonthlyReport(month);
-      const rows = [
-        ['Bulan Laporan', month],
-        ['Hari Pertemuan', rep.totalEvents],
-        ['Tingkat Kehadiran', rep.attendRate + '%'],
-        ['Total Setoran Hafalan', rep.totalSetoran],
-        [],
-        ['ID Santri', 'Nama Lengkap', 'Halaqah', 'Pertemuan', 'Hadir', 'Izin', 'Alpha', 'Kehadiran', 'Jumlah Setoran', 'Setoran Terakhir']
-      ];
-      rep.perAttendee.forEach((r) => {
-        rows.push([
-          r.attendeeId, `"${r.fullName}"`, `"${r.groupType}"`,
+    $('backToAdminBtn').addEventListener('click', () => {
+      state.currentStudent = null;
+      state.studentLogs = null;
+      $('studentShell').classList.add('hidden');
+      $('backToAdminBtn').classList.add('hidden');
+      $('studentLogoutBtn').classList.remove('hidden');
+      $('appShell').classList.remove('hidden');
+    });
+    $('reportMonthInput').addEventListener('change', renderReports);
+
+    function getExportDateRange() {
+      const startDate = $('exportStartDate').value;
+      const endDate = $('exportEndDate').value;
+      if (!startDate || !endDate || startDate > endDate) {
+        toast('Pilih rentang Dari Tanggal dan Sampai Tanggal yang valid.', 'error');
+        return null;
+      }
+      const rangeEvents = state.events
+        .filter((ev) => ev.date >= startDate && ev.date <= endDate)
+        .sort((a, b) => a.date.localeCompare(b.date));
+      const evIds = new Set(rangeEvents.map((e) => e.eventId));
+      const rangeLogs = state.logs.filter((l) => evIds.has(l.eventId));
+
+      const totalEvents = rangeEvents.length;
+      const totalSlots = totalEvents * state.attendees.length;
+      let totalPresent = 0, totalSetoran = 0;
+
+      const perAttendee = state.attendees.map((att) => {
+        let present = 0, excused = 0, noShow = 0, setoranCount = 0;
+        let lastSetoran = '-';
+        rangeEvents.forEach((ev) => {
+          const evLogs = rangeLogs.filter((l) => l.eventId === ev.eventId && l.attendeeId.toLowerCase() === att.attendeeId.toLowerCase());
+          const st = evLogs.length > 0 ? normalizeStatus(evLogs[0].status) : 'Alpha';
+          if (st === 'Hadir') present++;
+          else if (st === 'Izin') excused++;
+          else noShow++;
+          evLogs.forEach((l) => {
+            if (l.surah) {
+              setoranCount++;
+              lastSetoran = `QS. ${l.surah}${l.ayat && l.ayat !== '-' ? ':' + l.ayat : ''} (Juz ${l.juz || '-'})`;
+            }
+          });
+        });
+        totalPresent += present;
+        totalSetoran += setoranCount;
+        const rate = totalEvents > 0 ? Math.round((present / totalEvents) * 100) : 0;
+        return { ...att, totalEvents, present, excused, noShow, rate, setoranCount, lastSetoran };
+      });
+
+      const attendRate = totalSlots > 0 ? Math.round((totalPresent / totalSlots) * 100) : 0;
+      return { startDate, endDate, rangeEvents, rangeLogs, totalEvents, totalSetoran, attendRate, perAttendee };
+    }
+
+    /* ==================== EKSPOR EXCEL (.XLSX) SIAP PRINT OUT ==================== */
+    $('exportXlsxBtn').addEventListener('click', async () => {
+      if (typeof ExcelJS === 'undefined') {
+        toast('Pustaka Excel (ExcelJS) gagal dimuat. Periksa koneksi internet.', 'error');
+        return;
+      }
+      const rep = getExportDateRange();
+      if (!rep) return;
+
+      const wb = new ExcelJS.Workbook();
+      wb.creator = "Himalatul Qur'an";
+      wb.created = new Date();
+
+      const borderThin = {
+        top: { style: 'thin', color: { argb: 'FFCBD5E1' } },
+        left: { style: 'thin', color: { argb: 'FFCBD5E1' } },
+        bottom: { style: 'thin', color: { argb: 'FFCBD5E1' } },
+        right: { style: 'thin', color: { argb: 'FFCBD5E1' } }
+      };
+      const headerFill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0F766E' } };
+      const zebraFill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF8FAFC' } };
+
+      function stylePrintSheet(ws, colWidths, lastColLetter, headerRowNum, centerCols) {
+        ws.pageSetup = {
+          paperSize: 9, // A4
+          orientation: 'landscape',
+          fitToPage: true,
+          fitToWidth: 1,
+          fitToHeight: 0,
+          margins: { left: 0.4, right: 0.4, top: 0.5, bottom: 0.5, header: 0.2, footer: 0.2 }
+        };
+        colWidths.forEach((w, i) => { ws.getColumn(i + 1).width = w; });
+
+        ws.mergeCells(`A1:${lastColLetter}1`);
+        const titleCell = ws.getCell('A1');
+        titleCell.font = { name: 'Calibri', size: 14, bold: true, color: { argb: 'FF0F766E' } };
+        titleCell.alignment = { vertical: 'middle', horizontal: 'left' };
+        ws.getRow(1).height = 24;
+
+        for (let r = headerRowNum; r <= ws.rowCount; r++) {
+          const row = ws.getRow(r);
+          const isHeader = r === headerRowNum;
+          row.height = isHeader ? 24 : 20;
+          row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+            cell.border = borderThin;
+            if (isHeader) {
+              cell.fill = headerFill;
+              cell.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FFFFFFFF' } };
+              cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+            } else {
+              if ((r - headerRowNum) % 2 === 0) cell.fill = zebraFill;
+              cell.font = { name: 'Calibri', size: 10, color: { argb: 'FF0F172A' } };
+              cell.alignment = {
+                vertical: 'middle',
+                horizontal: centerCols.includes(colNumber) ? 'center' : 'left',
+                wrapText: true
+              };
+            }
+          });
+        }
+      }
+
+      // Sheet 1: Rangkuman Semua Santri
+      const wsSum = wb.addWorksheet('Rangkuman');
+      wsSum.addRow(["LAPORAN KEHADIRAN & SETORAN HAFALAN AL-QUR'AN — HIMALATUL QUR'AN"]);
+      wsSum.addRow(['Dari Tanggal', rep.startDate, 'Sampai Tanggal', rep.endDate, '', 'Hari Pertemuan', rep.totalEvents]);
+      wsSum.addRow(['Tingkat Kehadiran', rep.attendRate + '%', 'Total Setoran', rep.totalSetoran, '', 'Dicetak', new Date().toLocaleDateString('id-ID')]);
+      wsSum.addRow([]);
+      wsSum.addRow(['No', 'ID Santri', 'Nama Lengkap', 'Halaqah', 'Pertemuan', 'Hadir', 'Izin', 'Alpha', 'Kehadiran', 'Jml Setoran', 'Setoran Terakhir']);
+
+      rep.perAttendee.forEach((r, idx) => {
+        wsSum.addRow([
+          idx + 1, r.attendeeId, toTitleCase(r.fullName), r.groupType,
           r.totalEvents, r.present, r.excused, r.noShow,
-          r.rate + '%', r.setoranCount, `"${r.lastSetoran}"`
+          r.rate + '%', r.setoranCount, r.lastSetoran
         ]);
       });
-      rows.push([], ['--- DETAIL LOG SETORAN HAFALAN ---'], ['ID Sesi', 'ID Santri', 'Nama Santri', 'Status', 'Surah', 'Ayat', 'Juz', 'Jenis', 'Kesalahan Baca', 'Catatan']);
-      rep.monthLogs.forEach((l) => {
-        rows.push([
-          l.eventId, l.attendeeId, `"${l.fullName}"`, normalizeStatus(l.status),
-          `"${l.surah || ''}"`, `"${l.ayat || ''}"`, l.juz || '',
-          `"${l.jenisSetoran || ''}"`, l.kesalahanBaca || '0', `"${l.notes || ''}"`
-        ]);
+
+      [2, 3].forEach((r) => {
+        wsSum.getRow(r).getCell(1).font = { bold: true };
+        wsSum.getRow(r).getCell(3).font = { bold: true };
+        wsSum.getRow(r).getCell(6).font = { bold: true };
       });
-      const csv = rows.map((r) => r.join(',')).join('\n');
-      downloadFile(`laporan_tahfidz_${month}.csv`, csv, 'text/csv;charset=utf-8;');
-      toast('Laporan CSV bulanan berhasil diunduh!', 'success');
+      stylePrintSheet(wsSum, [5, 11, 24, 18, 11, 8, 8, 8, 12, 12, 34], 'K', 5, [1, 2, 5, 6, 7, 8, 9, 10]);
+
+      // Sheet 2 dst: Sheet Personal Masing-Masing Santri
+      const evMap = new Map(rep.rangeEvents.map((e) => [e.eventId, e]));
+      const usedNames = new Set(['rangkuman']);
+
+      rep.perAttendee.forEach((att) => {
+        let safeName = toTitleCase(att.fullName).replace(/[\\/?*\[\]:]/g, '').slice(0, 28).trim() || att.attendeeId;
+        let finalName = safeName;
+        let suffix = 2;
+        while (usedNames.has(finalName.toLowerCase())) {
+          finalName = safeName.slice(0, 25) + ' ' + suffix++;
+        }
+        usedNames.add(finalName.toLowerCase());
+
+        const wsP = wb.addWorksheet(finalName);
+        wsP.addRow([`REKAP PERSONAL SANTRI — ${toTitleCase(att.fullName).toUpperCase()}`]);
+        wsP.addRow(['ID Santri', att.attendeeId, 'Dari Tanggal', rep.startDate, 'Sampai Tanggal', rep.endDate]);
+        wsP.addRow(['Halaqah', att.groupType, 'Kehadiran', `${att.rate}% (Hadir: ${att.present}, Izin: ${att.excused}, Alpha: ${att.noShow})`, 'Total Setoran', `${att.setoranCount}x`]);
+        wsP.addRow([]);
+        wsP.addRow(['No', 'Tanggal', 'Status', 'QS. Surah', 'Ayat', 'Juz', 'Jenis Setoran', 'Kesalahan Baca', 'Catatan']);
+
+        const myLogs = rep.rangeLogs
+          .filter((l) => l.attendeeId.toLowerCase() === att.attendeeId.toLowerCase())
+          .sort((a, b) => (evMap.get(a.eventId)?.date || '').localeCompare(evMap.get(b.eventId)?.date || ''));
+
+        if (myLogs.length === 0) {
+          wsP.addRow(['-', '-', 'Belum ada catatan pada rentang tanggal ini', '-', '-', '-', '-', '-', '-']);
+        } else {
+          myLogs.forEach((l, idx) => {
+            const ev = evMap.get(l.eventId);
+            wsP.addRow([
+              idx + 1,
+              ev ? ev.date : (l.checkInTimestamp || '').slice(0, 10),
+              normalizeStatus(l.status),
+              l.surah ? `QS. ${l.surah}` : '-',
+              l.ayat || '-',
+              l.juz || '-',
+              l.jenisSetoran || '-',
+              l.kesalahanBaca || '0',
+              l.notes || '-'
+            ]);
+          });
+        }
+
+        [2, 3].forEach((r) => {
+          wsP.getRow(r).getCell(1).font = { bold: true };
+          wsP.getRow(r).getCell(3).font = { bold: true };
+          wsP.getRow(r).getCell(5).font = { bold: true };
+        });
+        stylePrintSheet(wsP, [5, 13, 10, 26, 13, 8, 14, 15, 28], 'I', 5, [1, 2, 3, 6, 8]);
+      });
+
+      const buffer = await wb.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `Laporan_Tahfidz_${rep.startDate}_sd_${rep.endDate}.xlsx`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+      toast('Laporan Excel (.xlsx) siap cetak berhasil diunduh!', 'success');
+    });
+
+    /* ==================== EKSPOR PDF (TABEL TERPISAH PER TANGGAL) ==================== */
+    $('exportPdfBtn').addEventListener('click', () => {
+      if (typeof window.jspdf === 'undefined') {
+        toast('Pustaka PDF (jsPDF) gagal dimuat. Periksa koneksi internet.', 'error');
+        return;
+      }
+      const rep = getExportDateRange();
+      if (!rep) return;
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+      doc.setFontSize(13);
+      doc.setTextColor(15, 118, 110);
+      doc.text("HIMALATUL QUR'AN — LAPORAN KEHADIRAN & SETORAN HAFALAN", 14, 15);
+
+      doc.setFontSize(9);
+      doc.setTextColor(71, 85, 105);
+      doc.text(`Periode: ${rep.startDate} s/d ${rep.endDate}   |   Pertemuan: ${rep.totalEvents} hari   |   Dicetak: ${new Date().toLocaleDateString('id-ID')}`, 14, 21);
+
+      // Tabel 1: Rangkuman Kehadiran Semua Santri
+      doc.setFontSize(10.5);
+      doc.setTextColor(15, 23, 42);
+      doc.text('A. Rangkuman Kehadiran & Total Setoran', 14, 29);
+
+      doc.autoTable({
+        startY: 32,
+        head: [['No', 'ID', 'Nama Santri', 'Hadir', 'Izin', 'Alpha', 'Kehadiran', 'Jml Setoran']],
+        body: rep.perAttendee.map((r, i) => [
+          i + 1, r.attendeeId, toTitleCase(r.fullName), r.present, r.excused, r.noShow, `${r.rate}%`, `${r.setoranCount}x`
+        ]),
+        theme: 'grid',
+        styles: { fontSize: 8.5, cellPadding: 2.2 },
+        headStyles: { fillColor: [15, 118, 110], textColor: 255, fontStyle: 'bold' },
+        columnStyles: {
+          0: { halign: 'center', cellWidth: 9 },
+          1: { cellWidth: 20 },
+          2: { fontStyle: 'bold' },
+          3: { halign: 'center', cellWidth: 14 },
+          4: { halign: 'center', cellWidth: 13 },
+          5: { halign: 'center', cellWidth: 14 },
+          6: { halign: 'center', cellWidth: 20 },
+          7: { halign: 'center', cellWidth: 22 }
+        }
+      });
+
+      // Bagian B: Tabel Terpisah Tiap Tanggal
+      const uniqueDates = [...new Set(rep.rangeEvents.map((e) => e.date))].sort();
+      let currentY = doc.lastAutoTable.finalY + 9;
+
+      if (uniqueDates.length > 0) {
+        if (currentY > 265) { doc.addPage(); currentY = 16; }
+        doc.setFontSize(10.5);
+        doc.setTextColor(15, 23, 42);
+        doc.text('B. Rincian Setoran Hafalan Per Tanggal', 14, currentY);
+        currentY += 5;
+      }
+
+      uniqueDates.forEach((dt, dayIdx) => {
+        const dayEvIds = new Set(rep.rangeEvents.filter((e) => e.date === dt).map((e) => e.eventId));
+        const dayLogs = rep.rangeLogs.filter((l) => dayEvIds.has(l.eventId) && l.surah);
+
+        if (currentY > 255) { doc.addPage(); currentY = 16; }
+        doc.setFontSize(9.5);
+        doc.setTextColor(15, 118, 110);
+        doc.text(`${dayIdx + 1}. Tanggal: ${dt}`, 14, currentY);
+
+        const bodyRows = dayLogs.length === 0
+          ? [['-', 'Tidak ada catatan setoran', '-', '-', '-', '-']]
+          : dayLogs.map((l, idx) => [
+              idx + 1,
+              toTitleCase(l.fullName),
+              l.jenisSetoran || '-',
+              l.juz || '-',
+              `QS. ${l.surah}${l.ayat && l.ayat !== '-' ? ':' + l.ayat : ''}`,
+              l.kesalahanBaca || '0'
+            ]);
+
+        doc.autoTable({
+          startY: currentY + 2,
+          head: [['No', 'Nama Santri', 'Jenis', 'Juz', 'QS. Surah', 'Kesalahan']],
+          body: bodyRows,
+          theme: 'grid',
+          styles: { fontSize: 8.2, cellPadding: 2 },
+          headStyles: { fillColor: [51, 65, 85], textColor: 255, fontStyle: 'bold' },
+          columnStyles: {
+            0: { halign: 'center', cellWidth: 9 },
+            1: { cellWidth: 44, fontStyle: 'bold' },
+            2: { cellWidth: 22 },
+            3: { halign: 'center', cellWidth: 14 },
+            4: { cellWidth: 'auto' },
+            5: { halign: 'center', cellWidth: 20 }
+          }
+        });
+
+        currentY = doc.lastAutoTable.finalY + 7;
+      });
+
+      doc.save(`Laporan_Tahfidz_${rep.startDate}_sd_${rep.endDate}.pdf`);
+      toast('Laporan PDF berhasil diunduh!', 'success');
     });
 
     /* ==================== PENGATURAN & SINKRONISASI ==================== */
@@ -1592,6 +1907,10 @@
     (async function init() {
       $('activeDateInput').value = state.activeDate;
       $('reportMonthInput').value = new Date().toISOString().slice(0, 7);
+      const dEnd = new Date();
+      const dStart = new Date(); dStart.setDate(dEnd.getDate() - 6);
+      $('exportStartDate').value = dStart.toISOString().slice(0, 10);
+      $('exportEndDate').value = dEnd.toISOString().slice(0, 10);
 
       if (state.pin) {
         try {
