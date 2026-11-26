@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Absensi &amp; Setoran Hafalan Al-Qur'an</title>
+  <title>Absensi &amp; Setoran Hafalan — Himalatul Qur'an</title>
   <!-- Pustaka Ringan Pemindai QR & Generator QR -->
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -363,21 +363,27 @@
 </head>
 <body>
 
-  <!-- ==================== LAYAR LOGIN PIN ADMIN ==================== -->
+  <!-- ==================== LAYAR LOGIN (ADMIN & SANTRI) ==================== -->
   <section id="authScreen" class="auth-wrapper">
     <div class="auth-card">
       <div class="auth-logo">HQ</div>
-      <h1 style="font-size:1.25rem; font-weight:800; margin-bottom:4px;">Absensi &amp; Setoran Hafalan Al-Qur'an</h1>
-      <p style="font-size:0.86rem; color:var(--text-muted); margin-bottom:18px;">
-        Masukkan PIN Admin / Ustadz untuk mengakses absensi halaqah, pencatatan setoran hafalan, dan laporan bulanan.
+      <h1 style="font-size:1.25rem; font-weight:800; margin-bottom:4px;">Absensi &amp; Setoran Hafalan</h1>
+      <p style="font-size:0.86rem; color:var(--text-muted); margin-bottom:14px;">
+        Halaqah Himalatul Qur'an — pilih mode masuk di bawah ini.
       </p>
 
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; background:var(--surface-alt); padding:4px; border-radius:10px; margin-bottom:16px;">
+        <button type="button" class="nav-tab active" id="modeAdminBtn" style="text-align:center;">Admin / Ustadz</button>
+        <button type="button" class="nav-tab" id="modeStudentBtn" style="text-align:center;">Murid / Santri</button>
+      </div>
+
+      <!-- Form Login Admin -->
       <form id="loginForm" style="display:flex; flex-direction:column; gap:12px;">
         <div>
           <label for="apiUrlInput">URL Web App Google Apps Script</label>
           <input id="apiUrlInput" type="url" placeholder="https://script.google.com/macros/s/.../exec" />
           <small style="color:var(--text-muted); font-size:0.75rem;">
-            Kosongkan untuk mencoba <strong>Mode Demo Lokal</strong> (PIN bawaan: <code>1234</code>).
+            Kosongkan untuk <strong>Mode Demo Lokal</strong> (PIN bawaan: <code>1234</code>).
           </small>
         </div>
 
@@ -387,12 +393,83 @@
         </div>
 
         <button type="submit" class="btn-primary" id="loginBtn" style="width:100%; padding:11px;">
-          Buka Dasbor
+          Masuk sebagai Admin
         </button>
       </form>
+
+      <!-- Form Login Murid / Santri -->
+      <form id="studentLoginForm" class="hidden" style="display:flex; flex-direction:column; gap:12px;">
+        <div>
+          <label for="studentUsernameInput">Username (Nama Lengkap Huruf Kecil)</label>
+          <input id="studentUsernameInput" type="text" placeholder="contoh: fitriati sulaiman" required />
+        </div>
+        <div>
+          <label for="studentPasswordInput">Password (Kata Pertama + 1234)</label>
+          <input id="studentPasswordInput" type="password" placeholder="contoh: fitriati1234" required />
+        </div>
+        <button type="submit" class="btn-primary" id="studentLoginBtn" style="width:100%; padding:11px;">
+          Lihat Data Saya
+        </button>
+      </form>
+
       <p id="loginError" style="color:var(--danger); font-size:0.84rem; margin-top:10px;" class="hidden"></p>
     </div>
   </section>
+
+  <!-- ==================== DASBOR KHUSUS MURID / SANTRI ==================== -->
+  <div id="studentShell" class="hidden">
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div class="brand">
+          <div class="brand-icon">HQ</div>
+          <div>
+            <div id="studentHeaderName" style="line-height:1.2;">Nama Santri</div>
+            <div id="studentHeaderMeta" style="font-size:0.74rem; font-weight:500; color:var(--text-muted);">ID Santri</div>
+          </div>
+        </div>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <button class="btn-primary btn-sm" id="studentShowQrBtn">Kartu QR Saya</button>
+          <button class="btn-danger btn-sm" id="studentLogoutBtn">Keluar</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="container">
+      <div class="grid-5">
+        <div class="stat-box"><div class="stat-label">Hadir</div><div class="stat-value" style="color:var(--success)" id="stStatHadir">0</div></div>
+        <div class="stat-box"><div class="stat-label">Terlambat</div><div class="stat-value" style="color:var(--warning)" id="stStatTerlambat">0</div></div>
+        <div class="stat-box"><div class="stat-label">Izin</div><div class="stat-value" style="color:var(--info)" id="stStatIzin">0</div></div>
+        <div class="stat-box"><div class="stat-label">Alpha</div><div class="stat-value" style="color:var(--danger)" id="stStatAlpha">0</div></div>
+        <div class="stat-box"><div class="stat-label">Total Setoran</div><div class="stat-value" style="color:var(--primary)" id="stStatSetoran">0</div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title" style="flex-wrap:wrap;">
+          <span>Riwayat Kehadiran &amp; Setoran Hafalan Saya</span>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <input id="studentMonthFilter" type="month" style="width:auto;" title="Filter per bulan" />
+            <button class="btn-outline btn-sm" id="studentClearMonthBtn">Semua Bulan</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Tanggal &amp; Sesi</th>
+                <th>Status</th>
+                <th>Surah &amp; Ayat</th>
+                <th>Juz</th>
+                <th>Jenis</th>
+                <th>Nilai</th>
+                <th>Catatan</th>
+              </tr>
+            </thead>
+            <tbody id="studentHistoryBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
 
   <!-- ==================== APLIKASI UTAMA ==================== -->
   <div id="appShell" class="hidden">
@@ -782,7 +859,7 @@
     const STORAGE_KEYS = {
       API_URL: 'hq_api_url',
       PIN: 'hq_session_pin',
-      DEMO_DATA: 'hq_demo_data_v2',
+      DEMO_DATA: 'hq_demo_data_v3',
       DEMO_PIN: 'hq_demo_pin'
     };
 
@@ -838,13 +915,15 @@
       const today = new Date().toISOString().slice(0, 10);
       const seed = {
         events: [
-          { eventId: 'SESI-PAGI1', eventName: 'Halaqah Subuh & Ziyadah', date: today, startTime: '05:30', lateCutoffTime: '05:45' },
-          { eventId: 'SESI-SORE1', eventName: 'Halaqah Sore & Murajaah', date: today, startTime: '16:00', lateCutoffTime: '16:15' }
+          { eventId: 'HQ-HARI-INI', eventName: "Halaqah Himalatul Qur'an (Hari Ini)", date: today, startTime: '08:00', lateCutoffTime: '08:15' }
         ],
         attendees: [
-          { attendeeId: 'SANTRI-101', fullName: 'Ahmad Fauzan', contact: '081234567801', groupType: 'Juz 30' },
-          { attendeeId: 'SANTRI-102', fullName: 'Siti Aisyah', contact: '081234567802', groupType: 'Juz 1-5' },
-          { attendeeId: 'SANTRI-103', fullName: 'Muhammad Bilal', contact: '081234567803', groupType: 'Tahfidz' }
+          { attendeeId: 'HQ-001', fullName: 'DAHLIA', contact: '', groupType: "HIMALATUL QUR'AN" },
+          { attendeeId: 'HQ-002', fullName: 'FITRIATI SULAIMAN', contact: '', groupType: "HIMALATUL QUR'AN" },
+          { attendeeId: 'HQ-003', fullName: 'NURHALIMAH', contact: '', groupType: "HIMALATUL QUR'AN" },
+          { attendeeId: 'HQ-004', fullName: 'SHOFIE', contact: '', groupType: "HIMALATUL QUR'AN" },
+          { attendeeId: 'HQ-005', fullName: 'LILYANA', contact: '', groupType: "HIMALATUL QUR'AN" },
+          { attendeeId: 'HQ-006', fullName: 'WAHIDA', contact: '', groupType: "HIMALATUL QUR'AN" }
         ],
         logs: []
       };
@@ -864,6 +943,16 @@
         if (action === 'verifyPin') {
           const valid = params.pin === storedPin;
           return { success: valid, authenticated: valid, message: valid ? 'PIN valid.' : 'PIN Admin salah.' };
+        }
+        if (action === 'studentLogin') {
+          const uname = String(params.username || '').trim().toLowerCase();
+          const pass = String(params.password || '').trim();
+          const student = store.attendees.find((a) => a.fullName.trim().toLowerCase() === uname);
+          if (!student) return { success: false, message: 'Nama santri tidak ditemukan.' };
+          const expected = student.fullName.trim().toLowerCase().split(/\s+/)[0] + '1234';
+          if (pass !== expected) return { success: false, message: 'Password salah.' };
+          const logs = store.logs.filter((l) => l.attendeeId.toLowerCase() === student.attendeeId.toLowerCase());
+          return { success: true, role: 'student', attendee: student, events: store.events, logs };
         }
         if (action === 'getAll') return { success: true, ...store };
         return { success: false, message: 'Aksi demo tidak dikenal' };
@@ -1026,7 +1115,147 @@
       return { success: false, message: 'Aksi tidak dikenal.' };
     }
 
-    /* ==================== OTENTIKASI ==================== */
+    /* ==================== OTENTIKASI (ADMIN & SANTRI) ==================== */
+    let currentStudent = null;
+
+    $('modeAdminBtn').addEventListener('click', () => {
+      $('modeAdminBtn').classList.add('active');
+      $('modeStudentBtn').classList.remove('active');
+      $('loginForm').classList.remove('hidden');
+      $('studentLoginForm').classList.add('hidden');
+      $('loginError').classList.add('hidden');
+    });
+
+    $('modeStudentBtn').addEventListener('click', () => {
+      $('modeStudentBtn').classList.add('active');
+      $('modeAdminBtn').classList.remove('active');
+      $('studentLoginForm').classList.remove('hidden');
+      $('loginForm').classList.add('hidden');
+      $('loginError').classList.add('hidden');
+    });
+
+    $('studentLoginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      $('loginError').classList.add('hidden');
+      $('studentLoginBtn').disabled = true;
+      $('studentLoginBtn').textContent = 'Memeriksa...';
+      try {
+        state.apiUrl = $('apiUrlInput').value.trim();
+        state.isDemo = !state.apiUrl;
+        const res = await apiGet('studentLogin', {
+          username: $('studentUsernameInput').value.trim(),
+          password: $('studentPasswordInput').value.trim()
+        });
+        if (!res.success) throw new Error(res.message || 'Login gagal.');
+
+        currentStudent = res.attendee;
+        state.events = (res.events || []).sort((a, b) => (b.date + b.startTime).localeCompare(a.date + a.startTime));
+        state.logs = res.logs || [];
+
+        $('authScreen').classList.add('hidden');
+        $('studentShell').classList.remove('hidden');
+        $('studentHeaderName').textContent = currentStudent.fullName;
+        $('studentHeaderMeta').textContent = `${currentStudent.attendeeId} · ${currentStudent.groupType || "HIMALATUL QUR'AN"}`;
+        $('studentMonthFilter').value = '';
+        renderStudentDashboard();
+      } catch (err) {
+        $('loginError').textContent = err.message || 'Gagal masuk.';
+        $('loginError').classList.remove('hidden');
+      } finally {
+        $('studentLoginBtn').disabled = false;
+        $('studentLoginBtn').textContent = 'Lihat Data Saya';
+      }
+    });
+
+    function renderStudentDashboard() {
+      if (!currentStudent) return;
+      const monthFilter = $('studentMonthFilter').value;
+      const evMap = new Map(state.events.map((e) => [e.eventId, e]));
+
+      const myLogs = state.logs.filter((l) => {
+        if (!monthFilter) return true;
+        const ev = evMap.get(l.eventId);
+        const dt = ev ? ev.date : (l.checkInTimestamp || '').slice(0, 10);
+        return String(dt).startsWith(monthFilter);
+      });
+
+      let hadir = 0, terlambat = 0, izin = 0, alpha = 0, setoran = 0;
+      myLogs.forEach((l) => {
+        const st = normalizeStatus(l.status);
+        if (st === 'Hadir') hadir++;
+        else if (st === 'Terlambat') terlambat++;
+        else if (st === 'Izin') izin++;
+        else if (st === 'Alpha') alpha++;
+        if (l.surah || l.notes) setoran++;
+      });
+
+      $('stStatHadir').textContent = hadir;
+      $('stStatTerlambat').textContent = terlambat;
+      $('stStatIzin').textContent = izin;
+      $('stStatAlpha').textContent = alpha;
+      $('stStatSetoran').textContent = setoran;
+
+      const tbody = $('studentHistoryBody');
+      if (myLogs.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--text-muted);">Belum ada catatan kehadiran atau setoran pada periode ini.</td></tr>';
+        return;
+      }
+
+      const sortedLogs = [...myLogs].sort((a, b) => {
+        const da = evMap.get(a.eventId)?.date || a.checkInTimestamp || '';
+        const db = evMap.get(b.eventId)?.date || b.checkInTimestamp || '';
+        return db.localeCompare(da);
+      });
+
+      tbody.innerHTML = sortedLogs.map((l) => {
+        const ev = evMap.get(l.eventId);
+        const st = normalizeStatus(l.status);
+        const badgeClass = `badge-${st.toLowerCase()}`;
+        return `
+          <tr>
+            <td>
+              <strong>${escapeHtml(ev ? ev.date : (l.checkInTimestamp || '').slice(0, 10))}</strong>
+              <div style="font-size:0.74rem; color:var(--text-muted);">${escapeHtml(ev ? ev.eventName : l.eventId)}</div>
+            </td>
+            <td><span class="badge ${badgeClass}">${escapeHtml(st)}</span></td>
+            <td><strong>${escapeHtml(l.surah || '-')}</strong>${l.ayat ? ` : ${escapeHtml(l.ayat)}` : ''}</td>
+            <td>${escapeHtml(l.juz || '-')}</td>
+            <td>${escapeHtml(l.jenisSetoran || '-')}</td>
+            <td>${escapeHtml(l.nilai || '-')}</td>
+            <td style="font-size:0.78rem;">${escapeHtml(l.notes || '-')}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    $('studentMonthFilter').addEventListener('change', renderStudentDashboard);
+    $('studentClearMonthBtn').addEventListener('click', () => {
+      $('studentMonthFilter').value = '';
+      renderStudentDashboard();
+    });
+
+    $('studentShowQrBtn').addEventListener('click', () => {
+      if (!currentStudent) return;
+      $('badgeGroup').textContent = currentStudent.groupType || "HIMALATUL QUR'AN";
+      $('badgeName').textContent = currentStudent.fullName;
+      $('badgeId').textContent = currentStudent.attendeeId;
+      const container = $('qrBadgeCanvas');
+      container.innerHTML = '';
+      if (typeof QRCode !== 'undefined') {
+        new QRCode(container, { text: currentStudent.attendeeId, width: 180, height: 180 });
+      } else {
+        container.textContent = currentStudent.attendeeId;
+      }
+      $('qrModal').classList.remove('hidden');
+    });
+
+    $('studentLogoutBtn').addEventListener('click', () => {
+      currentStudent = null;
+      $('studentPasswordInput').value = '';
+      $('studentShell').classList.add('hidden');
+      $('authScreen').classList.remove('hidden');
+    });
+
     async function attemptLogin(apiUrl, pin) {
       state.apiUrl = apiUrl.trim();
       state.isDemo = !state.apiUrl;
